@@ -1,6 +1,6 @@
-package io.hl.http.proxy.client;
+package io.hl.client;
 
-import io.hl.http.proxy.client.handler.HttpClientHandler;
+import io.hl.client.handler.HttpClientHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;

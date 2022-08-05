@@ -1,4 +1,4 @@
-package io.hl.http.proxy.client.socket;
+package io.hl.client.socket;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;

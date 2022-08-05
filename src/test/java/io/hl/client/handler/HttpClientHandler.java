@@ -1,4 +1,4 @@
-package io.hl.http.proxy.client.handler;
+package io.hl.client.handler;
 
 import io.hl.http.proxy.utils.http.HttpObjectUtils;
 import io.hl.http.proxy.utils.io.Charsets;

@@ -1,4 +1,4 @@
-package io.hl.http.proxy.client;
+package io.hl.client;
 
 import io.hl.http.proxy.utils.http.HttpObjectUtils;
 import io.netty.bootstrap.Bootstrap;
