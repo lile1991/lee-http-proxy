@@ -1,6 +1,6 @@
 package io.le.client;
 
-import io.le.http.proxy.utils.http.HttpObjectUtils;
+import io.le.proxy.server.utils.http.HttpObjectUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;

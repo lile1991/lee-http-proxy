@@ -1,6 +1,6 @@
 package io.le.client.handler;
 
-import io.le.http.proxy.utils.http.HttpObjectUtils;
+import io.le.proxy.server.utils.http.HttpObjectUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;

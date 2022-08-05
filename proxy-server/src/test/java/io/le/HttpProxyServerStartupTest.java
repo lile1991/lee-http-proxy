@@ -1,10 +1,10 @@
 package io.le;
 
-import io.le.http.proxy.relay.HttpProxyRelayServer;
-import io.le.http.proxy.relay.config.HttpProxyRelayServerConfig;
-import io.le.http.proxy.relay.config.ReplayRuleConfig;
-import io.le.http.proxy.server.HttpProxyServer;
-import io.le.http.proxy.server.config.HttpProxyServerConfig;
+import io.le.proxy.server.relay.HttpProxyRelayServer;
+import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
+import io.le.proxy.server.relay.config.ReplayRuleConfig;
+import io.le.proxy.server.server.HttpProxyServer;
+import io.le.proxy.server.server.config.HttpProxyServerConfig;
 
 import java.util.Arrays;
 
