@@ -36,7 +36,7 @@
     </appender>
 
     <logger name="io.netty.handler.ssl" level="WARN" />
-    <logger name="com.hw.http.proxy" level="DEBUG" />
+    <logger name="io.hl.http.proxy" level="DEBUG" />
 
     <!-- 日志输出级别 -->
     <root level="INFO" additivity="false">

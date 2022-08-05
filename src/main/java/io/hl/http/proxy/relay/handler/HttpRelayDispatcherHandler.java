@@ -61,7 +61,7 @@ public class HttpRelayDispatcherHandler extends ChannelInboundHandlerAdapter {
                 ctx.pipeline().addFirst(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
                 ctx.pipeline().addFirst(new HttpServerCodec());
                 ctx.pipeline().addFirst(sslCtx.newHandler(ctx.alloc()));
-                log.info("{} Add ssl handler to RelayChannel, ctx.pipeline: {}", ctx.channel(), ctx.pipeline().names());
+                log.debug("{} Add ssl handler to RelayChannel, ctx.pipeline: {}", ctx.channel(), ctx.pipeline().names());
 
                 // toProxyChannel增加SSLHandler
                 SslContext clientSslCtx = SslContextBuilder

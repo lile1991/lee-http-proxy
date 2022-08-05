@@ -68,10 +68,10 @@ public class HttpRelayConnectionHandler extends ChannelInboundHandlerAdapter {
                 // 添加Dispatcher
                 httpRelayDispatcherHandler = new HttpRelayDispatcherHandler(httpRequestInfo, serverConfig, realProxyChannel);
                 ctx.pipeline().addLast(httpRelayDispatcherHandler);
-                log.info("{} addLast HttpRelayDispatcherHandler", ctx.channel());
+                log.debug("{} addLast HttpRelayDispatcherHandler", ctx.channel());
 
-                // 消费掉消息队列
-                log.info("{} channel read message: {}", realProxyChannel, request);
+                // 消费掉消息
+                log.debug("{} channel read message: {}", realProxyChannel, request);
                 httpRelayDispatcherHandler.channelRead(ctx, request);
             } else {
                 log.error("RELAY failed connect to real proxy server {}:{}", serverConfig.getRealProxyHost(), serverConfig.getRealProxyPort());

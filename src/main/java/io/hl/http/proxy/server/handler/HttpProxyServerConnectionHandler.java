@@ -50,7 +50,7 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        log.info("收到消息: {}", msg);
+        log.debug("{}, channelRead: {}", ctx.channel(), msg);
         if(clientChannelFuture == null) {
             if(msg instanceof HttpRequest) {
                 // 建立或获取远端站点的连接， 转发数据
@@ -73,7 +73,7 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
                     ctx.pipeline().addFirst(new HttpServerCodec());
                     ctx.pipeline().addFirst(sslCtx.newHandler(ctx.alloc()));
 
-                    log.info("Add ssl handler to proxy server, ctx.pipeline: {}", ctx.pipeline().names());
+                    log.debug("Add ssl handler to proxy server, ctx.pipeline: {}", ctx.pipeline().names());
                     // 重走一遍 channelRead ， 解析HTTPS请求包
                     ctx.pipeline().fireChannelRead(msg);
                     return;

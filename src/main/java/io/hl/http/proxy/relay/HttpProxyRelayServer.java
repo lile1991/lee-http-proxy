@@ -24,7 +24,7 @@ public class HttpProxyRelayServer {
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(serverConfig.getBossGroupThreads());
         NioEventLoopGroup workerGroup = new NioEventLoopGroup(serverConfig.getWorkerGroupThreads());
-        log.info("HTTP proxy relay server bind to port: {}", serverConfig.getPort());
+        log.debug("HTTP proxy relay server bind to port: {}", serverConfig.getPort());
         serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 // .handler(new LoggingHandler(LogLevel.DEBUG))

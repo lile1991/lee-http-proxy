@@ -46,7 +46,7 @@ public class HttpClientUseProxy {
             connectRequest.headers().set("Proxy-Connection", "keep-alive");
             connectRequest.headers().set(HttpHeaderNames.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
             connectRequest.headers().set(AsciiString.of("content-length"), "0");
-            log.info("CONNECT TO level3");
+            log.debug("CONNECT TO level3");
             // future.channel().config().setAutoRead(false);
             future.channel().writeAndFlush(connectRequest);
             // future.channel().pipeline().addLast(SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build().newHandler( future.channel().alloc()));

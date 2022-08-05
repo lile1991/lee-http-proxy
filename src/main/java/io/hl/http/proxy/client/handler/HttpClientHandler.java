@@ -14,7 +14,7 @@ import java.util.Base64;
 public class HttpClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        log.info("read from proxy: \r\n{}", HttpObjectUtils.stringOf(msg));
+        log.debug("read from proxy: \r\n{}", HttpObjectUtils.stringOf(msg));
         /*if(ctx.channel().pipeline().get("clientSshHandler") == null) {
             SslContext clientSslCtx = SslContextBuilder
                     .forClient()
@@ -31,7 +31,7 @@ public class HttpClientHandler extends ChannelInboundHandlerAdapter {
         request.headers().set("accept-type", StandardCharsets.UTF_8);
         request.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
         // request.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
-        log.info("Request google");
+        log.debug("Request google");
         ctx.channel().writeAndFlush(request);
     }
 }

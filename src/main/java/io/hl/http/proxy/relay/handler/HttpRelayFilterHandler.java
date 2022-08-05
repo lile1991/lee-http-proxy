@@ -39,7 +39,7 @@ public class HttpRelayFilterHandler extends ChannelInboundHandlerAdapter {
         ctx.pipeline().remove(HttpRelayFilterHandler.class);
 
         if(isDirect(requestInfo)) {
-            log.info("Host {} go direct!", remoteHost);
+            log.debug("Host {} go direct!", remoteHost);
             HttpProxyServerConnectionHandler httpProxyServerConnectionHandler = new HttpProxyServerConnectionHandler(serverConfig);
             ctx.pipeline().addLast(httpProxyServerConnectionHandler);
             httpProxyServerConnectionHandler.channelRead(ctx, request);

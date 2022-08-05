@@ -70,20 +70,23 @@ public class HttpRealProxyHandler extends ChannelInboundHandlerAdapter {
         }
 
         Object request = relayChannel.attr(HttpRelayDispatcherHandler.REQUEST_ATTRIBUTE_KEY).get();
-        relayChannel.attr(RESPONSE_ATTRIBUTE_KEY).set(msg);
+        relayChannel.attr(HttpRelayDispatcherHandler.REQUEST_ATTRIBUTE_KEY).set(null);
+        // relayChannel.attr(RESPONSE_ATTRIBUTE_KEY).set(msg);
         relayChannel.writeAndFlush(msg).addListeners(future -> {
             if(request instanceof HttpRequest) {
                 HttpRequest httpRequest = (HttpRequest) request;
                 if(httpRequest.method() == HttpMethod.CONNECT) {
-                    relayChannel.pipeline().remove(HttpServerCodec.class);
-                    relayChannel.pipeline().remove(HttpObjectAggregator.class);
-                    log.info("Remove HttpServerCodec from relayChannel: {}", relayChannel.pipeline().names());
+                    if(relayChannel.pipeline().get(HttpServerCodec.class) != null) {
+                        relayChannel.pipeline().remove(HttpServerCodec.class);
+                        relayChannel.pipeline().remove(HttpObjectAggregator.class);
+                        log.debug("Remove HttpServerCodec from relayChannel: {}", relayChannel.pipeline().names());
 
-                    if(!serverConfig.isCodecSsl()) {
-                        // 不解码HTTPS， HttpClientCodec 也就无效了, 可以移除掉
-                        ctx.channel().pipeline().remove(HttpObjectAggregator.class);
-                        ctx.channel().pipeline().remove(HttpClientCodec.class);
-                        log.info("{} Remove HttpClientCodec from ToProxyChannel, pipeline: {}", ctx.channel(), ctx.pipeline().names());
+                        if (!serverConfig.isCodecSsl()) {
+                            // 不解码HTTPS， HttpClientCodec 也就无效了, 可以移除掉
+                            ctx.channel().pipeline().remove(HttpObjectAggregator.class);
+                            ctx.channel().pipeline().remove(HttpClientCodec.class);
+                            log.debug("{} Remove HttpClientCodec from ToProxyChannel, pipeline: {}", ctx.channel(), ctx.pipeline().names());
+                        }
                     }
                 }
             }

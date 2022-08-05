@@ -49,7 +49,7 @@ public class HttpClient {
                         ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
                             @Override
                             public void channelRead(ChannelHandlerContext ctx, Object msg) {
-                                log.info("read from origin: \r\n{}", HttpObjectUtils.stringOf(msg));
+                                log.debug("read from origin: \r\n{}", HttpObjectUtils.stringOf(msg));
                                 /*if(msg instanceof ByteBuf) {
                                     ch.pipeline().fireChannelRead(msg);
                                 }*/
@@ -65,7 +65,7 @@ public class HttpClient {
             getRequest.headers().set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
             getRequest.headers().set("Connection", "keep-alive");
             getRequest.headers().set(HttpHeaderNames.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
-            log.info("GET TO ckadmin.grights.club");
+            log.debug("GET TO ckadmin.grights.club");
             future.channel().writeAndFlush(getRequest);
         });
     }
