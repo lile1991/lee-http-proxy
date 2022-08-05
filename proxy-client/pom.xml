@@ -72,7 +72,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>io.le.HttpProxyServerStartup</mainClass>
+                            <mainClass>io.le.ProxyClientStartup</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -136,12 +136,12 @@
                         <configuration>
                             <headerType>gui</headerType>
                             <jar>${project.build.directory}/${project.build.finalName}-codec.jar</jar>
-                            <outfile>${project.build.directory}/HuLingProxy.exe</outfile>
+                            <outfile>${project.build.directory}/ProxyClient.exe</outfile>
                             <downloadUrl>http://java.com/download</downloadUrl>
                             <manifest>../proxy-client/hp.manifest</manifest>
                             <errTitle>App Err</errTitle>
                             <classPath>
-                                <mainClass>io.le.HttpProxyServerStartup</mainClass>
+                                <mainClass>io.le.ProxyClientStartup</mainClass>
                             </classPath>
                             <icon>src/main/resources/favicon.ico</icon>
                             <jre>
