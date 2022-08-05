@@ -2,8 +2,11 @@ package io.hl;
 
 import io.hl.http.proxy.relay.HttpProxyRelayServer;
 import io.hl.http.proxy.relay.config.HttpProxyRelayServerConfig;
+import io.hl.http.proxy.relay.config.ReplayRuleConfig;
 import io.hl.http.proxy.server.HttpProxyServer;
 import io.hl.http.proxy.server.config.HttpProxyServerConfig;
+
+import java.util.Arrays;
 
 public class HttpProxyServerStartup {
     public static void main(String[] args) {
@@ -35,6 +38,10 @@ public class HttpProxyServerStartup {
         httpProxyRelayServerConfig.setPort(40001);
         httpProxyRelayServerConfig.setBossGroupThreads(5);
         httpProxyRelayServerConfig.setWorkerGroupThreads(10);
+
+        ReplayRuleConfig replayRuleConfig = new ReplayRuleConfig();
+        replayRuleConfig.setDirectHosts(Arrays.asList("ip111", "baidu.com"));
+        httpProxyRelayServerConfig.setReplayFilterConfig(replayRuleConfig);
         httpRelayProxyServer.start(httpProxyRelayServerConfig);
 
         // curl -x 127.0.0.1:8888 --insecure https://www.baidu.com
