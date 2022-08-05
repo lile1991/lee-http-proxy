@@ -1,15 +1,14 @@
 #!/bin/bash
 #java options
-APP_MAINCLASS=com.hw.http.proxy.HttpProxyServerStartup
+APP_MAINCLASS=io.le.HttpProxyServerStartup
 PROC_NAME=HttpProxyServerStartup
-CLASS_PATH=.:dependency/*:classes/
 # 日志路径，加不加引号都行。 注意：等号两边 不能 有空格，否则会提示command找不到
-LOG_PATh=/data/application/hl-proxy/nohup.out
+LOG_PATh=/data/application/http-proxy/nohup.out
 
 #Xms inin memery
 #Xmx max memery
 #Xmn young memery
-JAVA_OPTS="-Duser.timezone="GMT+8" -Xms512m -Xmx2G -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m -Xloggc:logs/gc.log -cp .:classes/:dependency/*"
+JAVA_OPTS="-Duser.timezone="GMT+8" -Xms256m -Xmx1G -XX:CompressedClassSpaceSize=128m -XX:MetaspaceSize=200m -XX:MaxMetaspaceSize=200m -Xloggc:logs/gc.log -jar http-proxy-1.0-codec.jar"
 # 启动方法
 start() {
 	# 重新获取一下pid，因为其它操作如stop会导致pid的状态更新
