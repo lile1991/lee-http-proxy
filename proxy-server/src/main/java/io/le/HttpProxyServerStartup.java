@@ -2,11 +2,8 @@ package io.le;
 
 import io.le.http.proxy.relay.HttpProxyRelayServer;
 import io.le.http.proxy.relay.config.HttpProxyRelayServerConfig;
-import io.le.http.proxy.relay.config.ReplayRuleConfig;
 import io.le.http.proxy.server.HttpProxyServer;
 import io.le.http.proxy.server.config.HttpProxyServerConfig;
-
-import java.util.Arrays;
 
 public class HttpProxyServerStartup {
     public static void main(String[] args) {

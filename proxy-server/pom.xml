@@ -2,30 +2,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.hw</groupId>
-    <artifactId>http-proxy</artifactId>
+    <groupId>io.le</groupId>
+    <artifactId>proxy-server</artifactId>
     <version>1.0</version>
-    <parent>
-        <groupId>com.facebook</groupId>
-        <artifactId>fb-parent</artifactId>
-        <version>1.0</version>
-    </parent>
-
+    <modelVersion>4.0.0</modelVersion>
     <properties>
         <netty-tcnative.version>2.0.41.Final</netty-tcnative.version>
+        <slf4j.version>1.7.30</slf4j.version>
+        <logback.version>1.2.3</logback.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
+            <version>4.1.67.Final</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.brotli/dec -->
         <dependency>
             <groupId>org.brotli</groupId>
             <artifactId>dec</artifactId>
+            <version>0.1.2</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.aayushatharva.brotli4j/brotli4j -->
         <dependency>
@@ -49,19 +46,23 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.12</version>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
         </dependency>
 
         <!-- Needed for OCSP -->
@@ -83,6 +84,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
                 <configuration>
                     <skipTests>true</skipTests>    <!--默认关掉单元测试 -->
                 </configuration>
@@ -154,7 +156,7 @@
                     <!--                    <outjar>/fb-client-release/fb-client/target/classes</outjar>-->
                     <outjar>${project.build.finalName}-codec.jar</outjar>
                     <obfuscate>true</obfuscate>
-                    <proguardInclude>${project.basedir}/proguard.cfg</proguardInclude>
+                    <proguardInclude>proguard.cfg</proguardInclude>
                     <libs>
                         <!-- Include main JAVA library required.-->
                         <lib>${java.home}/lib/rt.jar</lib>
@@ -187,7 +189,7 @@
                         <configuration>
                             <headerType>gui</headerType>
                             <jar>${project.build.directory}/${project.build.finalName}-codec.jar</jar>
-                            <outfile>${project.basedir}/target/HuLingProxy.exe</outfile>
+                            <outfile>${project.build.directory}/HuLingProxy.exe</outfile>
                             <downloadUrl>http://java.com/download</downloadUrl>
                             <manifest>hp.manifest</manifest>
                             <errTitle>App Err</errTitle>
