@@ -1,7 +1,7 @@
 package io.hl.http.proxy.relay;
 
 import io.hl.http.proxy.relay.config.HttpProxyRelayServerConfig;
-import io.hl.http.proxy.relay.handler.HttpDirectOrRelaySelector;
+import io.hl.http.proxy.relay.handler.HttpRelayFilterHandler;
 import io.hl.http.proxy.relay.handler.codec.lee.LeeServerCodec;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -38,7 +38,7 @@ public class HttpProxyRelayServer {
                         ch.pipeline()
                             .addLast(new HttpServerCodec())
                             .addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()))
-                            .addLast(new HttpDirectOrRelaySelector(serverConfig))
+                            .addLast(new HttpRelayFilterHandler(serverConfig))
                             // .addLast(new HttpRelayConnectionHandler(serverConfig))
                             ;
                     }
