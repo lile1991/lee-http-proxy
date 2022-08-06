@@ -6,6 +6,8 @@ import io.le.proxy.server.server.config.HttpProxyServerConfig;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -55,52 +57,67 @@ public class Settings {
     private void addSettingField() {
         JPanel jPanel = new JPanel();
 
+        JComboBox<String> proxyNode;
+        JComboBox<String> proxyRule;
+        JTextArea proxyHosts;
+        JTextArea doNotProxyHosts;
         jPanel.setLayout(new GridLayout(5, 2));
         {
             JLabel jLabel = new JLabel("Proxy node");
-            JComboBox<String> jComboBox = new JComboBox<>();
-            jComboBox.addItem("HK");
-            jComboBox.addItem("US");
+            proxyNode = new JComboBox<>();
+            proxyNode.addItem("HK");
+            proxyNode.addItem("US");
 
             jPanel.add(jLabel);
-            jPanel.add(jComboBox);
+            jPanel.add(proxyNode);
         }
 
         {
             JLabel jLabel = new JLabel("Proxy rule");
-            JComboBox<String> jComboBox = new JComboBox<>();
-            jComboBox.addItem(ReplayRuleConfig.ProxyMode.DEFAULT.desc);
-            jComboBox.addItem(ReplayRuleConfig.ProxyMode.ONLY_PROXY.desc);
+            proxyRule = new JComboBox<>();
+            proxyRule.addItem(ReplayRuleConfig.ProxyMode.DEFAULT.desc);
+            proxyRule.addItem(ReplayRuleConfig.ProxyMode.ONLY_PROXY.desc);
 
             jPanel.add(jLabel);
-            jPanel.add(jComboBox);
+            jPanel.add(proxyRule);
         }
 
         {
             JLabel jLabel = new JLabel("Proxy hosts");
-            JTextArea jTextArea = new JTextArea();
-            JScrollPane jScrollPane=new JScrollPane(jTextArea);
+            proxyHosts = new JTextArea();
+            JScrollPane jScrollPane=new JScrollPane(proxyHosts);
             jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             jPanel.add(jLabel);
-            jPanel.add(jTextArea);
+            jPanel.add(proxyHosts);
         }
         {
             JLabel jLabel = new JLabel("Do not proxy hosts");
-            JTextArea jTextArea = new JTextArea();
-            JScrollPane jScrollPane=new JScrollPane(jTextArea);
+            doNotProxyHosts = new JTextArea();
+            JScrollPane jScrollPane=new JScrollPane(doNotProxyHosts);
             jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             jPanel.add(jLabel);
-            jPanel.add(jTextArea);
+            jPanel.add(doNotProxyHosts);
         }
 
         {
             JLabel jLabel = new JLabel("");
-            JButton jButton = new JButton("Apply");
+            JButton apply = new JButton("Apply");
 
             jPanel.add(jLabel);
-            jPanel.add(jButton);
+            jPanel.add(apply);
+
+            apply.addActionListener(e -> {
+                // Save Settings
+                String proxyNodeItem = (String) proxyNode.getSelectedItem();
+                String proxyRuleItem = (String) proxyRule.getSelectedItem();
+                String proxyHostsText = proxyHosts.getText();
+                String doNotProxyHostsText = doNotProxyHosts.getText();
+
+
+                // Notify proxy server
+            });
         }
         frame.add(jPanel);
     }
