@@ -57,7 +57,7 @@ public class HttpRelayFilterHandler extends ChannelInboundHandlerAdapter {
         }
 
         switch (replayFilterConfig.getFilterMode()) {
-            case ONLY_PROXY_TARGET:
+            case ONLY_PROXY:
                 List<String> proxyHosts = replayFilterConfig.getProxyHosts();
                 if(proxyHosts != null) {
                     for (String proxyHost : proxyHosts) {

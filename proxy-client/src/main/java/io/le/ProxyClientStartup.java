@@ -1,5 +1,6 @@
 package io.le;
 
+import io.le.proxy.client.gui.Settings;
 import io.le.proxy.client.gui.TrayGUI;
 import io.le.proxy.server.relay.HttpProxyRelayServer;
 import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
@@ -23,8 +24,9 @@ public class ProxyClientStartup {
             log.warn("Apply skin Exception: " + e.getMessage());
         }
 
-        TrayGUI trayGUI = new TrayGUI();
-        proxySystem();
+        Settings settings = new Settings();
+        TrayGUI trayGUI = new TrayGUI(settings);
+        // proxySystem();
     }
 
     private static void proxySystem() {

@@ -10,15 +10,17 @@ import java.awt.event.MouseEvent;
 @Slf4j
 public class TrayGUI {
 
+    private Settings settings;
     private TrayIcon trayIcon;
 
-    public TrayGUI() {
+    public TrayGUI(Settings settings) {
         if(! SystemTray.isSupported()) {
             log.warn("The current system does not support trays!");
             return;
         }
 
         try {
+            this.settings = settings;
             // 获得本操作系统托盘的实例
             SystemTray tray = SystemTray.getSystemTray();
 
@@ -39,6 +41,7 @@ public class TrayGUI {
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() == 2) {
                         // Double click
+                        settings.setVisible(!settings.isVisible());
                     }
 
                 }
