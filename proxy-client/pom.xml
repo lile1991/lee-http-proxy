@@ -138,7 +138,7 @@
                             <jar>${project.build.directory}/${project.build.finalName}-codec.jar</jar>
                             <outfile>${project.build.directory}/ProxyClient.exe</outfile>
                             <downloadUrl>http://java.com/download</downloadUrl>
-                            <manifest>../proxy-client/hp.manifest</manifest>
+                            <manifest>./hp.manifest</manifest>
                             <errTitle>App Err</errTitle>
                             <classPath>
                                 <mainClass>io.le.ProxyClientStartup</mainClass>
