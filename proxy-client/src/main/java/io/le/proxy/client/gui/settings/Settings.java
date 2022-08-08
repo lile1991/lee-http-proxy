@@ -1,10 +1,12 @@
 package io.le.proxy.client.gui.settings;
 
 import io.le.proxy.client.HttpProxyRelayClient;
+import io.le.proxy.client.gui.TrayGUI;
 import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
 import io.le.proxy.server.relay.config.ReplayRuleConfig;
 import io.le.proxy.server.server.config.HttpProxyServerConfig;
 import io.le.proxy.server.utils.lang.StringUtils;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
@@ -17,6 +19,8 @@ import java.util.Arrays;
 public class Settings {
     private final HttpProxyRelayClient httpProxyRelayClient;
     private final JFrame frame;
+    @Setter
+    private TrayGUI trayGUI;
 
     HttpProxyRelayServerConfig httpProxyRelayServerConfig;
     public Settings(HttpProxyRelayClient httpProxyRelayClient) {
@@ -42,6 +46,15 @@ public class Settings {
         frame.setResizable(false);
         frame.setVisible(true);
 
+        // 监听关闭事件
+        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }
+        });
+
         frame.addWindowStateListener(new WindowAdapter() {
             @Override
             public void windowStateChanged(WindowEvent e) {
@@ -49,10 +62,13 @@ public class Settings {
                     // minimize
                     frame.setState(0);
                     frame.setVisible(false);
+                    trayGUI.add();
                 }else if(e.getNewState() == 0) {
                     // normal
+                    // trayGUI.remove();
                 }else if(e.getNewState() == 6) {
                     // maximize
+                    // trayGUI.remove();
                 }
             }
         });

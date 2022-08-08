@@ -23,5 +23,6 @@ public class ProxyClientStartup {
         HttpProxyRelayClient httpProxyRelayClient = new HttpProxyRelayClient();
         Settings settings = new Settings(httpProxyRelayClient);
         TrayGUI trayGUI = new TrayGUI(settings);
+        settings.setTrayGUI(trayGUI);
     }
 }
