@@ -1,29 +1,31 @@
 package io.le.proxy.client.gui;
 
+import io.le.proxy.client.HttpProxyRelayClient;
 import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
 import io.le.proxy.server.relay.config.ReplayRuleConfig;
 import io.le.proxy.server.server.config.HttpProxyServerConfig;
+import io.le.proxy.server.utils.lang.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
 
 public class Settings {
+    private final HttpProxyRelayClient httpProxyRelayClient;
     private final JFrame frame;
 
     HttpProxyRelayServerConfig httpProxyRelayServerConfig;
-    public Settings() {
-
+    public Settings(HttpProxyRelayClient httpProxyRelayClient) {
+        this.httpProxyRelayClient = httpProxyRelayClient;
         httpProxyRelayServerConfig = new HttpProxyRelayServerConfig();
         httpProxyRelayServerConfig.setCodecSsl(false);
         httpProxyRelayServerConfig.setProxyProtocol(HttpProxyServerConfig.ProxyProtocol.HTTP);
         httpProxyRelayServerConfig.setRelayProtocol(HttpProxyServerConfig.ProxyProtocol.LEE);
 
         ReplayRuleConfig replayRuleConfig = new ReplayRuleConfig();
-        httpProxyRelayServerConfig.setReplayFilterConfig(replayRuleConfig);
+        httpProxyRelayServerConfig.setReplayRuleConfig(replayRuleConfig);
 
         frame = new JFrame("Minus one");
         Toolkit toolkit = Toolkit.getDefaultToolkit(); // 获取Toolkit对象
@@ -57,69 +59,104 @@ public class Settings {
     private void addSettingField() {
         JPanel jPanel = new JPanel();
 
-        JComboBox<String> proxyNode;
-        JComboBox<String> proxyRule;
-        JTextArea proxyHosts;
-        JTextArea doNotProxyHosts;
+        SettingsForm settingsForm = new SettingsForm();
         jPanel.setLayout(new GridLayout(5, 2));
         {
             JLabel jLabel = new JLabel("Proxy node");
-            proxyNode = new JComboBox<>();
-            proxyNode.addItem("HK");
-            proxyNode.addItem("US");
+            settingsForm.proxyNodeComboBox = new JComboBox<>();
+            settingsForm.proxyNodeComboBox.addItem("HK");
+            settingsForm.proxyNodeComboBox.addItem("US");
 
             jPanel.add(jLabel);
-            jPanel.add(proxyNode);
+            jPanel.add(settingsForm.proxyNodeComboBox);
         }
 
         {
-            JLabel jLabel = new JLabel("Proxy rule");
-            proxyRule = new JComboBox<>();
-            proxyRule.addItem(ReplayRuleConfig.ProxyMode.DEFAULT.desc);
-            proxyRule.addItem(ReplayRuleConfig.ProxyMode.ONLY_PROXY.desc);
+            JLabel jLabel = new JLabel("Proxy mode");
+            settingsForm.proxyModeComboBox = new JComboBox<>();
+            settingsForm.proxyModeComboBox.addItem(ReplayRuleConfig.ProxyMode.DEFAULT.desc);
+            settingsForm.proxyModeComboBox.addItem(ReplayRuleConfig.ProxyMode.ONLY.desc);
 
             jPanel.add(jLabel);
-            jPanel.add(proxyRule);
+            jPanel.add(settingsForm.proxyModeComboBox);
         }
 
         {
             JLabel jLabel = new JLabel("Proxy hosts");
-            proxyHosts = new JTextArea();
-            JScrollPane jScrollPane=new JScrollPane(proxyHosts);
+            settingsForm.proxyHostsTextArea = new JTextArea();
+            JScrollPane jScrollPane=new JScrollPane(settingsForm.proxyHostsTextArea);
             jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             jPanel.add(jLabel);
-            jPanel.add(proxyHosts);
+            jPanel.add(settingsForm.proxyHostsTextArea);
         }
         {
             JLabel jLabel = new JLabel("Do not proxy hosts");
-            doNotProxyHosts = new JTextArea();
-            JScrollPane jScrollPane=new JScrollPane(doNotProxyHosts);
+            settingsForm.doNotProxyHostsTextArea = new JTextArea();
+            JScrollPane jScrollPane=new JScrollPane(settingsForm.doNotProxyHostsTextArea);
             jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             jPanel.add(jLabel);
-            jPanel.add(doNotProxyHosts);
+            jPanel.add(settingsForm.doNotProxyHostsTextArea);
         }
 
         {
-            JLabel jLabel = new JLabel("");
-            JButton apply = new JButton("Apply");
+            JButton update = new JButton("Update");
+            JButton start = new JButton("Start");
 
-            jPanel.add(jLabel);
-            jPanel.add(apply);
+            jPanel.add(update);
+            jPanel.add(start);
 
-            apply.addActionListener(e -> {
+            update.addActionListener(e -> {
+                SettingsForm.Form form = settingsForm.get();
+                updateRelayServerConfig(httpProxyRelayServerConfig, form);
+            });
+
+            start.addActionListener(e -> {
+                start.setEnabled(false);
                 // Save Settings
-                String proxyNodeItem = (String) proxyNode.getSelectedItem();
-                String proxyRuleItem = (String) proxyRule.getSelectedItem();
-                String proxyHostsText = proxyHosts.getText();
-                String doNotProxyHostsText = doNotProxyHosts.getText();
 
+                SettingsForm.Form form = settingsForm.get();
 
+                HttpProxyRelayServerConfig httpProxyRelayServerConfig = httpProxyRelayClient.getHttpProxyRelayServerConfig();
+                httpProxyRelayServerConfig.setCodecSsl(false);
+                httpProxyRelayServerConfig.setProxyProtocol(HttpProxyServerConfig.ProxyProtocol.HTTP);
+                httpProxyRelayServerConfig.setRelayProtocol(HttpProxyServerConfig.ProxyProtocol.LEE);
+
+                httpProxyRelayServerConfig.setReplayRuleConfig(new ReplayRuleConfig());
+                updateRelayServerConfig(httpProxyRelayServerConfig, form);
+                httpProxyRelayClient.start();
                 // Notify proxy server
             });
         }
         frame.add(jPanel);
+    }
+
+    private void updateRelayServerConfig(HttpProxyRelayServerConfig httpProxyRelayServerConfig, SettingsForm.Form form) {
+        switch (form.getProxyNode()) {
+            case "HK":
+                httpProxyRelayServerConfig.setRealProxyHost("8.210.18.42");
+                httpProxyRelayServerConfig.setRealProxyPort(40000);
+                break;
+            case "US":
+                httpProxyRelayServerConfig.setRealProxyHost("74.91.26.90");
+                httpProxyRelayServerConfig.setRealProxyPort(40000);
+                break;
+        }
+        httpProxyRelayServerConfig.setPort(40001);
+        httpProxyRelayServerConfig.setBossGroupThreads(5);
+        httpProxyRelayServerConfig.setWorkerGroupThreads(10);
+
+        ReplayRuleConfig replayRuleConfig = httpProxyRelayServerConfig.getReplayRuleConfig();
+        ReplayRuleConfig.ProxyMode proxyModeEnum = ReplayRuleConfig.ProxyMode.enumOfDesc(form.getProxyMode());
+        replayRuleConfig.setProxyMode(proxyModeEnum);
+        if(StringUtils.isNotBlack(form.getProxyHosts())) {
+            replayRuleConfig.setProxyHosts(Arrays.asList(form.getProxyHosts().split("[\\s,，]")));
+        }
+        if(StringUtils.isNotBlack(form.getDoNotProxyHosts())) {
+            replayRuleConfig.setDirectHosts(Arrays.asList(form.getDoNotProxyHosts().split("[\\s,，]")));
+        }
+
     }
 
     public void setVisible(boolean visible) {

@@ -13,8 +13,12 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 @Slf4j
 public class HttpProxyRelayServer {
+
+    private AtomicBoolean running = new AtomicBoolean(false);
 
     /**
      * 启动代理中继服务器
@@ -22,6 +26,10 @@ public class HttpProxyRelayServer {
      * @param serverConfig 服务器配置
      */
     public void start(HttpProxyRelayServerConfig serverConfig) {
+        if(!running.compareAndSet(false, true)) {
+            log.error("HTTP proxy relay server already running!");
+        }
+
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(serverConfig.getBossGroupThreads());
         NioEventLoopGroup workerGroup = new NioEventLoopGroup(serverConfig.getWorkerGroupThreads());
@@ -45,5 +53,9 @@ public class HttpProxyRelayServer {
                     }
                 })
                 .bind(serverConfig.getPort());
+    }
+
+    public boolean isRunning() {
+        return running.get();
     }
 }
