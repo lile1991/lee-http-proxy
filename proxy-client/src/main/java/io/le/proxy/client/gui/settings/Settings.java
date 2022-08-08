@@ -1,10 +1,11 @@
-package io.le.proxy.client.gui;
+package io.le.proxy.client.gui.settings;
 
 import io.le.proxy.client.HttpProxyRelayClient;
 import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
 import io.le.proxy.server.relay.config.ReplayRuleConfig;
 import io.le.proxy.server.server.config.HttpProxyServerConfig;
 import io.le.proxy.server.utils.lang.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,6 +13,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Arrays;
 
+@Slf4j
 public class Settings {
     private final HttpProxyRelayClient httpProxyRelayClient;
     private final JFrame frame;
@@ -91,14 +93,16 @@ public class Settings {
             jPanel.add(settingsForm.proxyHostsTextArea);
         }
         {
-            JLabel jLabel = new JLabel("Do not proxy hosts");
-            settingsForm.doNotProxyHostsTextArea = new JTextArea();
-            JScrollPane jScrollPane=new JScrollPane(settingsForm.doNotProxyHostsTextArea);
+            JLabel jLabel = new JLabel("Direct hosts");
+            settingsForm.directHostsTextArea = new JTextArea();
+            JScrollPane jScrollPane=new JScrollPane(settingsForm.directHostsTextArea);
             jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             jPanel.add(jLabel);
-            jPanel.add(settingsForm.doNotProxyHostsTextArea);
+            jPanel.add(settingsForm.directHostsTextArea);
         }
+
+        settingsForm.readConfig();
 
         {
             JButton update = new JButton("Update");
@@ -108,8 +112,7 @@ public class Settings {
             jPanel.add(start);
 
             update.addActionListener(e -> {
-                SettingsForm.Form form = settingsForm.get();
-                updateRelayServerConfig(httpProxyRelayServerConfig, form);
+                updateRelayServerConfig(httpProxyRelayServerConfig, settingsForm);
             });
 
             start.addActionListener(e -> {
@@ -124,7 +127,7 @@ public class Settings {
                 httpProxyRelayServerConfig.setRelayProtocol(HttpProxyServerConfig.ProxyProtocol.LEE);
 
                 httpProxyRelayServerConfig.setReplayRuleConfig(new ReplayRuleConfig());
-                updateRelayServerConfig(httpProxyRelayServerConfig, form);
+                updateRelayServerConfig(httpProxyRelayServerConfig, settingsForm);
                 httpProxyRelayClient.start();
                 // Notify proxy server
             });
@@ -132,7 +135,8 @@ public class Settings {
         frame.add(jPanel);
     }
 
-    private void updateRelayServerConfig(HttpProxyRelayServerConfig httpProxyRelayServerConfig, SettingsForm.Form form) {
+    private void updateRelayServerConfig(HttpProxyRelayServerConfig httpProxyRelayServerConfig, SettingsForm settingsForm) {
+        SettingsForm.Form form = settingsForm.get();
         switch (form.getProxyNode()) {
             case "HK":
                 httpProxyRelayServerConfig.setRealProxyHost("8.210.18.42");
@@ -148,15 +152,16 @@ public class Settings {
         httpProxyRelayServerConfig.setWorkerGroupThreads(10);
 
         ReplayRuleConfig replayRuleConfig = httpProxyRelayServerConfig.getReplayRuleConfig();
-        ReplayRuleConfig.ProxyMode proxyModeEnum = ReplayRuleConfig.ProxyMode.enumOfDesc(form.getProxyMode());
+        ReplayRuleConfig.ProxyMode proxyModeEnum = ReplayRuleConfig.ProxyMode.enumOfDesc(settingsForm.form.getProxyMode());
         replayRuleConfig.setProxyMode(proxyModeEnum);
         if(StringUtils.isNotBlack(form.getProxyHosts())) {
             replayRuleConfig.setProxyHosts(Arrays.asList(form.getProxyHosts().split("[\\s,，]")));
         }
-        if(StringUtils.isNotBlack(form.getDoNotProxyHosts())) {
-            replayRuleConfig.setDirectHosts(Arrays.asList(form.getDoNotProxyHosts().split("[\\s,，]")));
+        if(StringUtils.isNotBlack(form.getDirectHosts())) {
+            replayRuleConfig.setDirectHosts(Arrays.asList(form.getDirectHosts().split("[\\s,，]")));
         }
 
+        settingsForm.saveConfig();
     }
 
     public void setVisible(boolean visible) {

@@ -51,14 +51,14 @@ public class HttpRelayFilterHandler extends ChannelInboundHandlerAdapter {
     }
 
     private boolean isDirect(HttpRequestInfo requestInfo) {
-        ReplayRuleConfig replayFilterConfig = serverConfig.getReplayFilterConfig();
-        if(replayFilterConfig == null) {
+        ReplayRuleConfig replayRuleConfig = serverConfig.getReplayRuleConfig();
+        if(replayRuleConfig == null) {
             return false;
         }
 
-        switch (replayFilterConfig.getProxyMode()) {
+        switch (replayRuleConfig.getProxyMode()) {
             case ONLY:
-                List<String> proxyHosts = replayFilterConfig.getProxyHosts();
+                List<String> proxyHosts = replayRuleConfig.getProxyHosts();
                 if(proxyHosts != null) {
                     for (String proxyHost : proxyHosts) {
                         if (requestInfo.getRemoteHost().contains(proxyHost)) {
@@ -70,7 +70,7 @@ public class HttpRelayFilterHandler extends ChannelInboundHandlerAdapter {
                 // Direct
                 return true;
             default:
-                List<String> directHosts = replayFilterConfig.getDirectHosts();
+                List<String> directHosts = replayRuleConfig.getDirectHosts();
                 if(directHosts != null) {
                     for (String directHost : directHosts) {
                         if (requestInfo.getRemoteHost().contains(directHost)) {
