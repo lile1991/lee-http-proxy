@@ -18,6 +18,6 @@ public class HttpProxyRelayServerConfig extends HttpProxyServerConfig {
     /** 中继协议 */
     private ProxyProtocol relayProtocol = ProxyProtocol.HTTP;
 
-    /** 中继器过滤配置 */
-    private ReplayRuleConfig replayFilterConfig;
+    /** 中继器规则配置 */
+    private ReplayRuleConfig replayRuleConfig;
 }
