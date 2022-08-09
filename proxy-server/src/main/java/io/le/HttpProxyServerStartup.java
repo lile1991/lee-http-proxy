@@ -10,14 +10,28 @@ public class HttpProxyServerStartup {
         // demo6789();
 
         // HTTP代理(不解码HTTPS)
-        HttpProxyServer httpProxyServer = new HttpProxyServer();
-        HttpProxyServerConfig httpProxyServerConfig = new HttpProxyServerConfig();
-        httpProxyServerConfig.setProxyProtocol(HttpProxyServerConfig.ProxyProtocol.LEE);
-        httpProxyServerConfig.setCodecSsl(false);
-        httpProxyServerConfig.setPort(40000);
-        httpProxyServerConfig.setBossGroupThreads(5);
-        httpProxyServerConfig.setWorkerGroupThreads(10);
-        httpProxyServer.start(httpProxyServerConfig);
+        {
+            HttpProxyServer httpProxyServer = new HttpProxyServer();
+            HttpProxyServerConfig httpProxyServerConfig = new HttpProxyServerConfig();
+            httpProxyServerConfig.setProxyProtocol(HttpProxyServerConfig.ProxyProtocol.HTTP);
+            httpProxyServerConfig.setCodecSsl(false);
+            httpProxyServerConfig.setPort(40005);
+            httpProxyServerConfig.setBossGroupThreads(5);
+            httpProxyServerConfig.setWorkerGroupThreads(10);
+            httpProxyServer.start(httpProxyServerConfig);
+        }
+
+        // HTTP代理(不解码HTTPS)
+        {
+            HttpProxyServer httpProxyServer = new HttpProxyServer();
+            HttpProxyServerConfig httpProxyServerConfig = new HttpProxyServerConfig();
+            httpProxyServerConfig.setProxyProtocol(HttpProxyServerConfig.ProxyProtocol.LEE);
+            httpProxyServerConfig.setCodecSsl(false);
+            httpProxyServerConfig.setPort(40000);
+            httpProxyServerConfig.setBossGroupThreads(5);
+            httpProxyServerConfig.setWorkerGroupThreads(10);
+            httpProxyServer.start(httpProxyServerConfig);
+        }
     }
 
     private static void demo6789() {
