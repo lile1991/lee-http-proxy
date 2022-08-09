@@ -1,8 +1,14 @@
 package io.le.proxy.server.server.config;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+import java.net.InetAddress;
+import java.net.SocketAddress;
+
+@Setter
+@Getter
 public class HttpProxyServerConfig {
     /** 绑定的端口 */
     protected int port;
@@ -15,6 +21,8 @@ public class HttpProxyServerConfig {
 
     protected int bossGroupThreads;
     protected int workerGroupThreads;
+
+    private SocketAddress localAddress;
 
     /** 代理协议 */
     protected ProxyProtocol proxyProtocol = ProxyProtocol.HTTP;

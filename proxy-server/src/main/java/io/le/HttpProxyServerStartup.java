@@ -4,22 +4,15 @@ import io.le.proxy.server.relay.HttpProxyRelayServer;
 import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
 import io.le.proxy.server.server.HttpProxyServer;
 import io.le.proxy.server.server.config.HttpProxyServerConfig;
+import io.le.proxy.server.utils.net.LocaleInetAddresses;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.Random;
 
 public class HttpProxyServerStartup {
     public static void main(String[] args) {
         // demo6789();
-
-        // HTTP代理(不解码HTTPS)
-        {
-            HttpProxyServer httpProxyServer = new HttpProxyServer();
-            HttpProxyServerConfig httpProxyServerConfig = new HttpProxyServerConfig();
-            httpProxyServerConfig.setProxyProtocol(HttpProxyServerConfig.ProxyProtocol.HTTP);
-            httpProxyServerConfig.setCodecSsl(false);
-            httpProxyServerConfig.setPort(40005);
-            httpProxyServerConfig.setBossGroupThreads(5);
-            httpProxyServerConfig.setWorkerGroupThreads(10);
-            httpProxyServer.start(httpProxyServerConfig);
-        }
 
         // HTTP代理(不解码HTTPS)
         {
@@ -31,6 +24,35 @@ public class HttpProxyServerStartup {
             httpProxyServerConfig.setBossGroupThreads(5);
             httpProxyServerConfig.setWorkerGroupThreads(10);
             httpProxyServer.start(httpProxyServerConfig);
+        }
+
+        // HTTP代理(不解码HTTPS)
+        {
+            InetAddress[] inetAddresses = LocaleInetAddresses.getInetAddresses();
+            if(inetAddresses == null || inetAddresses.length == 0) {
+                HttpProxyServer httpProxyServer = new HttpProxyServer();
+                HttpProxyServerConfig httpProxyServerConfig = new HttpProxyServerConfig();
+                httpProxyServerConfig.setProxyProtocol(HttpProxyServerConfig.ProxyProtocol.HTTP);
+                httpProxyServerConfig.setCodecSsl(false);
+                httpProxyServerConfig.setPort(40005);
+                httpProxyServerConfig.setBossGroupThreads(5);
+                httpProxyServerConfig.setWorkerGroupThreads(10);
+                httpProxyServer.start(httpProxyServerConfig);
+            } else {
+                Random random = new Random();
+                for (int i = 0, inetAddressesLength = inetAddresses.length; i < inetAddressesLength; i++) {
+                    InetAddress inetAddress = inetAddresses[i];
+                    HttpProxyServer httpProxyServer = new HttpProxyServer();
+                    HttpProxyServerConfig httpProxyServerConfig = new HttpProxyServerConfig();
+                    httpProxyServerConfig.setProxyProtocol(HttpProxyServerConfig.ProxyProtocol.HTTP);
+                    httpProxyServerConfig.setCodecSsl(false);
+                    httpProxyServerConfig.setPort(40001 + i);
+                    httpProxyServerConfig.setBossGroupThreads(5);
+                    httpProxyServerConfig.setWorkerGroupThreads(10);
+                    httpProxyServerConfig.setLocalAddress(new InetSocketAddress(inetAddress, 45000 + random.nextInt(5000)));
+                    httpProxyServer.start(httpProxyServerConfig);
+                }
+            }
         }
     }
 
