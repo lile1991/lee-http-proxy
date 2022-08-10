@@ -45,6 +45,7 @@ stop() {
     echo ""
     echo "Service stop successfully！pid:${pid} which has been killed forcibly!"
     echo ""
+    stop
 	fi
 }
 

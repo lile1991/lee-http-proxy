@@ -12,6 +12,8 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -122,7 +124,16 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 45 * 1000)
+                // Bind remote ip and port
+                // .localAddress(serverIp, randomSystemPort)
+                // Bind local ip and port
+                // .remoteAddress(serverIp, randomSystemPort)
                 .handler(new HttpProxyClientInitHandler(ctx.channel(), serverConfig, httpRequestInfo));
+
+        if(serverConfig.getLocalAddress() != null) {
+            // Bind local net address
+            bootstrap.remoteAddress(serverConfig.getLocalAddress());
+        }
 
         ChannelFuture clientChannelFuture = bootstrap.connect(httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort());
         clientChannelFuture.addListener((ChannelFutureListener) future -> {
