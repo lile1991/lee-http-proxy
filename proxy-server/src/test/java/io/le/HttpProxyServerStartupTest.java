@@ -42,7 +42,7 @@ public class HttpProxyServerStartupTest {
 
         ReplayRuleConfig replayRuleConfig = new ReplayRuleConfig();
         replayRuleConfig.setDirectHosts(Arrays.asList("ip111", "baidu.com"));
-        httpProxyRelayServerConfig.setReplayFilterConfig(replayRuleConfig);
+        httpProxyRelayServerConfig.setReplayRuleConfig(replayRuleConfig);
         httpRelayProxyServer.start(httpProxyRelayServerConfig);
 
         // curl -x 127.0.0.1:8888 --insecure https://www.baidu.com

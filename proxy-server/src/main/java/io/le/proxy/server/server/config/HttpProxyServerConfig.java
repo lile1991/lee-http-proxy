@@ -28,6 +28,6 @@ public class HttpProxyServerConfig {
     protected ProxyProtocol proxyProtocol = ProxyProtocol.HTTP;
 
     public enum ProxyProtocol {
-        HTTP, LEE
+        HTTP, HTTPS, LEE
     }
 }

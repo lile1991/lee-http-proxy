@@ -1,0 +1,1 @@
+curl --insecure -v -x https://127.0.0.1:40002 https://ipinfo.io
