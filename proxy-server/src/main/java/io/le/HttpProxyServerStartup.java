@@ -34,10 +34,19 @@ public class HttpProxyServerStartup {
                 HttpProxyServerConfig httpProxyServerConfig = new HttpProxyServerConfig();
                 httpProxyServerConfig.setProxyProtocol(HttpProxyServerConfig.ProxyProtocol.HTTP);
                 httpProxyServerConfig.setCodecSsl(false);
-                httpProxyServerConfig.setPort(40005);
+                httpProxyServerConfig.setPort(40001);
                 httpProxyServerConfig.setBossGroupThreads(5);
                 httpProxyServerConfig.setWorkerGroupThreads(10);
                 httpProxyServer.start(httpProxyServerConfig);
+
+                HttpProxyServer httpsProxyServer = new HttpProxyServer();
+                HttpProxyServerConfig httpsProxyServerConfig = new HttpProxyServerConfig();
+                httpsProxyServerConfig.setProxyProtocol(HttpProxyServerConfig.ProxyProtocol.HTTPS);
+                httpsProxyServerConfig.setCodecSsl(false);
+                httpsProxyServerConfig.setPort(40002);
+                httpsProxyServerConfig.setBossGroupThreads(5);
+                httpsProxyServerConfig.setWorkerGroupThreads(10);
+                httpsProxyServer.start(httpsProxyServerConfig);
             } else {
                 Random random = new Random();
                 for (int i = 0, inetAddressesLength = inetAddresses.length; i < inetAddressesLength; i++) {
