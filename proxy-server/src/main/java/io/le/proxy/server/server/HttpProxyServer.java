@@ -1,7 +1,7 @@
 package io.le.proxy.server.server;
 
 import io.le.proxy.server.server.config.HttpProxyServerConfig;
-import io.le.proxy.server.server.handler.HttpProxyProtocolHandler;
+import io.le.proxy.server.server.handler.ProxyUnificationServerHandler;
 import io.le.proxy.server.server.handler.HttpProxyServerConnectionHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -36,7 +36,7 @@ public class HttpProxyServer {
                     protected void initChannel(Channel ch) throws CertificateException, SSLException {
                         ch.pipeline()
                             // .addLast(new LoggingHandler())
-                            .addLast(new HttpProxyProtocolHandler(serverConfig))
+                            .addLast(new ProxyUnificationServerHandler(serverConfig))
                             .addLast(new HttpServerCodec())
                             .addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()))
                             .addLast(new HttpProxyServerConnectionHandler(serverConfig));

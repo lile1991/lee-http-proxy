@@ -20,7 +20,10 @@ public class HttpProxyServerStartup {
         {
             HttpProxyServer httpProxyServer = new HttpProxyServer();
             HttpProxyServerConfig httpProxyServerConfig = new HttpProxyServerConfig();
-            httpProxyServerConfig.setProxyProtocols(Arrays.asList(ProxyProtocolEnum.HTTP, ProxyProtocolEnum.HTTPS));
+            httpProxyServerConfig.setProxyProtocols(Arrays.asList(ProxyProtocolEnum.HTTP,
+                    ProxyProtocolEnum.HTTPS,
+                    ProxyProtocolEnum.SOCKS4a,
+                    ProxyProtocolEnum.SOCKS5));
             httpProxyServerConfig.setCodecSsl(false);
             httpProxyServerConfig.setPort(40000);
             httpProxyServerConfig.setBossGroupThreads(5);

@@ -4,7 +4,7 @@ import io.le.proxy.client.HttpProxyRelayClient;
 import io.le.proxy.client.gui.TrayGUI;
 import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
 import io.le.proxy.server.relay.config.ReplayRuleConfig;
-import io.le.proxy.server.server.config.HttpProxyServerConfig;
+import io.le.proxy.server.server.config.ProxyProtocolEnum;
 import io.le.proxy.server.utils.lang.StringUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Arrays;
+import java.util.Collections;
 
 @Slf4j
 public class Settings {
@@ -27,8 +28,8 @@ public class Settings {
         this.httpProxyRelayClient = httpProxyRelayClient;
         httpProxyRelayServerConfig = new HttpProxyRelayServerConfig();
         httpProxyRelayServerConfig.setCodecSsl(false);
-        httpProxyRelayServerConfig.setProxyProtocol(HttpProxyServerConfig.ProxyProtocol.HTTP);
-        httpProxyRelayServerConfig.setRelayProtocol(HttpProxyServerConfig.ProxyProtocol.LEE);
+        // httpProxyRelayServerConfig.setProxyProtocols(HttpProxyServerConfig.ProxyProtocol.HTTP);
+        // httpProxyRelayServerConfig.setRelayProtocols(HttpProxyServerConfig.ProxyProtocol.LEE);
 
         ReplayRuleConfig replayRuleConfig = new ReplayRuleConfig();
         httpProxyRelayServerConfig.setReplayRuleConfig(replayRuleConfig);
@@ -139,8 +140,8 @@ public class Settings {
 
                 HttpProxyRelayServerConfig httpProxyRelayServerConfig = httpProxyRelayClient.getHttpProxyRelayServerConfig();
                 httpProxyRelayServerConfig.setCodecSsl(false);
-                httpProxyRelayServerConfig.setProxyProtocol(HttpProxyServerConfig.ProxyProtocol.HTTP);
-                httpProxyRelayServerConfig.setRelayProtocol(HttpProxyServerConfig.ProxyProtocol.LEE);
+                httpProxyRelayServerConfig.setProxyProtocols(Collections.singletonList(ProxyProtocolEnum.HTTP));
+                httpProxyRelayServerConfig.setRelayProtocols(Arrays.asList(ProxyProtocolEnum.HTTP, ProxyProtocolEnum.LEE));
 
                 httpProxyRelayServerConfig.setReplayRuleConfig(new ReplayRuleConfig());
                 updateRelayServerConfig(httpProxyRelayServerConfig, settingsForm);

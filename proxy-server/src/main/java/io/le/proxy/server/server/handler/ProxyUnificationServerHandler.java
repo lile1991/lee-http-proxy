@@ -6,24 +6,28 @@ import io.le.proxy.server.server.config.ProxyProtocolEnum;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.handler.codec.http2.Http2SecurityUtil;
+import io.netty.handler.codec.socksx.SocksVersion;
+import io.netty.handler.codec.socksx.v4.Socks4ServerDecoder;
+import io.netty.handler.codec.socksx.v4.Socks4ServerEncoder;
+import io.netty.handler.codec.socksx.v5.Socks5InitialRequestDecoder;
+import io.netty.handler.codec.socksx.v5.Socks5ServerEncoder;
 import io.netty.handler.ssl.*;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLException;
-import java.net.SocketAddress;
 import java.security.cert.CertificateException;
 
 /**
  * 用于同时支持 HTTP、HTTPS、SOCKS4、SOCKS5 代理协议
  */
 @Slf4j
-public class HttpProxyProtocolHandler extends ChannelInboundHandlerAdapter {
+public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter {
 
     private HttpProxyServerConfig serverConfig;
 
-    public HttpProxyProtocolHandler(HttpProxyServerConfig serverConfig) {
+    public ProxyUnificationServerHandler(HttpProxyServerConfig serverConfig) {
         this.serverConfig = serverConfig;
     }
 
@@ -33,17 +37,37 @@ public class HttpProxyProtocolHandler extends ChannelInboundHandlerAdapter {
         if(protocol == null) {
             return;
         }
+
+        if(!serverConfig.getProxyProtocols().contains(protocol)) {
+            log.warn("The proxy server does not support the {} protocol!", protocol);
+            ctx.close();
+            return;
+        }
+
+        ChannelPipeline p = ctx.pipeline();
         switch (protocol) {
             case HTTPS: addHttpsSupport(ctx); break;
-            case SOCKS5: break;
+            case SOCKS4a:
+                p.addAfter(ctx.name(), null, Socks4ServerEncoder.INSTANCE);
+                p.addAfter(ctx.name(), null, new Socks4ServerDecoder());
+                break;
+            case SOCKS5:
+                p.addAfter(ctx.name(), null, Socks5ServerEncoder.DEFAULT);
+                p.addAfter(ctx.name(), null, new Socks5InitialRequestDecoder());
+                break;
         }
 
-        if (serverConfig.getProxyProtocols().contains(ProxyProtocolEnum.LEE)) {
-            ctx.pipeline().addBefore(ctx.name(), null, new LeeServerCodec());
-        }
+        /*if (serverConfig.getProxyProtocols().contains(ProxyProtocolEnum.LEE)) {
+            p.addBefore(ctx.name(), null, new LeeServerCodec());
+        }*/
 
         ctx.pipeline().remove(getClass());
+        logKnownVersion(ctx, protocol);
         super.channelRead(ctx, msg);
+    }
+
+    private static void logKnownVersion(ChannelHandlerContext ctx, ProxyProtocolEnum version) {
+        log.debug("{} Protocol version: {}", ctx.channel(), version);
     }
 
     private ProxyProtocolEnum parseProxyProtocol(ByteBuf msg) {
@@ -55,16 +79,20 @@ public class HttpProxyProtocolHandler extends ChannelInboundHandlerAdapter {
         // HTTPS 22
         // SOCKS ?
         // HTTP 67 //
-        byte firstByte = msg.getByte(readerIndex);
-        return firstByte == 22 ? ProxyProtocolEnum.HTTPS : ProxyProtocolEnum.HTTP;
+        byte versionVal = msg.getByte(readerIndex);
+        SocksVersion socksVersion = SocksVersion.valueOf(versionVal);
+        switch (socksVersion) {
+            case SOCKS4a:
+                return ProxyProtocolEnum.SOCKS4a;
+            case SOCKS5:
+                return ProxyProtocolEnum.SOCKS5;
+            default:
+                return versionVal == 22 ? ProxyProtocolEnum.HTTPS : ProxyProtocolEnum.HTTP;
+        }
     }
 
     public void addHttpsSupport(ChannelHandlerContext ctx) throws SSLException, CertificateException {
         Channel ch = ctx.channel();
-        if(!serverConfig.getProxyProtocols().contains(ProxyProtocolEnum.HTTPS)) {
-            log.warn("{} not support https proxy", ch);
-            return;
-        }
 
         // Support HTTPS proxy protocol
         SelfSignedCertificate ssc = new SelfSignedCertificate();
