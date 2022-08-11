@@ -6,10 +6,7 @@ import io.le.proxy.server.server.handler.http.HttpProxyServerConnectionHandler;
 import io.le.proxy.server.server.handler.https.SslHandlerCreator;
 import io.le.proxy.server.server.handler.socks5.Socks5InitialRequestHandler;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.*;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.socksx.SocksVersion;
@@ -20,6 +17,8 @@ import io.netty.handler.codec.socksx.v5.Socks5ServerEncoder;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 
 /**
@@ -41,6 +40,8 @@ public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter 
             return;
         }
 
+        logKnownVersion(ctx, protocol);
+
         if(!serverConfig.getProxyProtocols().contains(protocol)) {
             log.warn("The proxy server does not support the {} protocol!", protocol);
             ctx.close();
@@ -57,6 +58,10 @@ public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter 
                 break;
             case SOCKS5:
                 addSocks5Handler(ctx); break;
+            default:
+                ctx.write(ctx.alloc().buffer().writeCharSequence("Proxy protocol not supported.", StandardCharsets.UTF_8))
+                        .addListener(ChannelFutureListener.CLOSE);
+                return;
         }
 
         /*if (serverConfig.getProxyProtocols().contains(ProxyProtocolEnum.LEE)) {
@@ -64,7 +69,6 @@ public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter 
         }*/
 
         ctx.pipeline().remove(getClass());
-        logKnownVersion(ctx, protocol);
         super.channelRead(ctx, msg);
     }
 
