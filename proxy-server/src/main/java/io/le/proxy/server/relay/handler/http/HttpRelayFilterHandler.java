@@ -1,4 +1,4 @@
-package io.le.proxy.server.relay.handler;
+package io.le.proxy.server.relay.handler.http;
 
 import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
 import io.le.proxy.server.relay.config.ReplayRuleConfig;
