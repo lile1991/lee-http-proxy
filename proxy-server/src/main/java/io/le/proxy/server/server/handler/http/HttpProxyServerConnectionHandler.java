@@ -25,7 +25,7 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
 
     private HttpRequestInfo httpRequestInfo;
     private final HttpProxyServerConfig serverConfig;
-    private HttpProxyServerDispatcherHandler httpProxyServerDispatcherHandler;
+    private HttpProxyExchangeHandler httpProxyExchangeHandler;
     private ChannelFuture clientChannelFuture;
     private final List<Object> messageQueue = new ArrayList<>();
 
@@ -81,13 +81,13 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
             }
 
             synchronized (messageQueue) {
-                if (httpProxyServerDispatcherHandler == null) {
+                if (httpProxyExchangeHandler == null) {
                     // 远端连接尚未建立， 消息暂存到队列中
                     // 在连接成功后（clientChannelFuture.addListener 被调用）， messageQueue会被一次性全部转发并清空
                     messageQueue.add(msg);
                 } else {
                     // 远程连接已经建立， 直接交给DispatcherHandler转发
-                    httpProxyServerDispatcherHandler.channelRead(ctx, msg);
+                    httpProxyExchangeHandler.channelRead(ctx, msg);
                 }
             }
         }
@@ -145,13 +145,13 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
                         // 移除Connect
                         ctx.pipeline().remove(HttpProxyServerConnectionHandler.class);
                         // 添加Dispatcher
-                        httpProxyServerDispatcherHandler = new HttpProxyServerDispatcherHandler(serverConfig, httpRequestInfo, clientChannel);
-                        ctx.pipeline().addLast(httpProxyServerDispatcherHandler);
+                        httpProxyExchangeHandler = new HttpProxyExchangeHandler(serverConfig, clientChannel);
+                        ctx.pipeline().addLast(httpProxyExchangeHandler);
                     }
 
                     // 消费掉消息队列
                     for (Object msg : messageQueue) {
-                        httpProxyServerDispatcherHandler.channelRead(ctx, msg);
+                        httpProxyExchangeHandler.channelRead(ctx, msg);
                     }
                     messageQueue.clear();
                 }

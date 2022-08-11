@@ -31,7 +31,7 @@ public class Socks5ProxyServerConnectionHandler extends SimpleChannelInboundHand
                         protected void initChannel(SocketChannel ch) throws Exception {
                             //ch.pipeline().addLast(new LoggingHandler());//in out
                             //将目标服务器信息转发给客户端
-                            ch.pipeline().addLast(new Socks5ServerDispatcherHandler(serverConfig, ctx.channel()));
+                            ch.pipeline().addLast(new Socks5ProxyExchangeHandler(serverConfig, ctx.channel()));
                         }
                     });
             log.trace("连接目标服务器");
@@ -42,7 +42,7 @@ public class Socks5ProxyServerConnectionHandler extends SimpleChannelInboundHand
                     Channel clientChannel = future.channel();
                     if(future.isSuccess()) {
                         log.debug("{} Successfully connected to {}:{}!", clientChannel, msg.dstAddr(), msg.dstPort());
-                        ctx.pipeline().addLast(new Socks5ProxyClientDispatcherHandler(serverConfig, clientChannel));
+                        ctx.pipeline().addLast(new Socks5ProxyExchangeHandler(serverConfig, clientChannel));
                         Socks5CommandResponse commandResponse = new DefaultSocks5CommandResponse(Socks5CommandStatus.SUCCESS, Socks5AddressType.IPv4);
                         ctx.writeAndFlush(commandResponse);
                     } else {

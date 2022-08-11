@@ -1,4 +1,4 @@
-package io.le.proxy.server.server.handler.http;
+package io.le.proxy.server.server.handler.socks5;
 
 import io.le.proxy.server.server.config.HttpProxyServerConfig;
 import io.le.proxy.server.utils.http.HttpObjectUtils;
@@ -7,14 +7,17 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Socks5代理交换机
+ */
 @Slf4j
-public class HttpProxyClientHandler extends ChannelInboundHandlerAdapter {
+public class Socks5ProxyExchangeHandler extends ChannelInboundHandlerAdapter {
     private final HttpProxyServerConfig serverConfig;
-    private final Channel proxyServerChannel;
+    private final Channel exchangeChannel;
 
-    public HttpProxyClientHandler(HttpProxyServerConfig serverConfig, Channel proxyServerChannel) {
+    public Socks5ProxyExchangeHandler(HttpProxyServerConfig serverConfig, Channel exchangeChannel) {
         this.serverConfig = serverConfig;
-        this.proxyServerChannel = proxyServerChannel;
+        this.exchangeChannel = exchangeChannel;
     }
 
     /**
@@ -26,11 +29,11 @@ public class HttpProxyClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if(log.isDebugEnabled()) {
             if(serverConfig.isCodecSsl()) {
-                log.debug("{} read {} from remote: \r\n{}", proxyServerChannel.toString(), msg.getClass().getSimpleName(), HttpObjectUtils.stringOf(msg));
+                log.debug("{} read {} from remote: \r\n{}", exchangeChannel.toString(), msg.getClass().getSimpleName(), HttpObjectUtils.stringOf(msg));
             } else {
-                log.debug("{} read {} from remote: \r\n{}", proxyServerChannel.toString(), msg.getClass().getSimpleName(), msg);
+                log.debug("{} read {} from remote: \r\n{}", exchangeChannel.toString(), msg.getClass().getSimpleName(), msg);
             }
         }
-        proxyServerChannel.writeAndFlush(msg);
+        exchangeChannel.writeAndFlush(msg);
     }
 }

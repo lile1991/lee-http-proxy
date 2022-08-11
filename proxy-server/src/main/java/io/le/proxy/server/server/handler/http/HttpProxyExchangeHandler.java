@@ -1,4 +1,4 @@
-package io.le.proxy.server.server.handler.socks5;
+package io.le.proxy.server.server.handler.http;
 
 import io.le.proxy.server.server.config.HttpProxyServerConfig;
 import io.le.proxy.server.utils.http.HttpObjectUtils;
@@ -7,14 +7,17 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Http代理交换机
+ */
 @Slf4j
-public class Socks5ProxyClientDispatcherHandler extends ChannelInboundHandlerAdapter {
+public class HttpProxyExchangeHandler extends ChannelInboundHandlerAdapter {
     private final HttpProxyServerConfig serverConfig;
-    private final Channel proxyServerChannel;
+    private final Channel exchangeChannel;
 
-    public Socks5ProxyClientDispatcherHandler(HttpProxyServerConfig serverConfig, Channel proxyServerChannel) {
+    public HttpProxyExchangeHandler(HttpProxyServerConfig serverConfig, Channel exchangeChannel) {
         this.serverConfig = serverConfig;
-        this.proxyServerChannel = proxyServerChannel;
+        this.exchangeChannel = exchangeChannel;
     }
 
     /**
@@ -26,11 +29,11 @@ public class Socks5ProxyClientDispatcherHandler extends ChannelInboundHandlerAda
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if(log.isDebugEnabled()) {
             if(serverConfig.isCodecSsl()) {
-                log.debug("{} read {} from remote: \r\n{}", proxyServerChannel.toString(), msg.getClass().getSimpleName(), HttpObjectUtils.stringOf(msg));
+                log.debug("{} read {} from remote: \r\n{}", exchangeChannel.toString(), msg.getClass().getSimpleName(), HttpObjectUtils.stringOf(msg));
             } else {
-                log.debug("{} read {} from remote: \r\n{}", proxyServerChannel.toString(), msg.getClass().getSimpleName(), msg);
+                log.debug("{} read {} from remote: \r\n{}", exchangeChannel.toString(), msg.getClass().getSimpleName(), msg);
             }
         }
-        proxyServerChannel.writeAndFlush(msg);
+        exchangeChannel.writeAndFlush(msg);
     }
 }
