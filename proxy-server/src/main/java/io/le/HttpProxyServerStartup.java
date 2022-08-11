@@ -5,6 +5,7 @@ import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
 import io.le.proxy.server.server.HttpProxyServer;
 import io.le.proxy.server.server.config.HttpProxyServerConfig;
 import io.le.proxy.server.server.config.ProxyProtocolEnum;
+import io.le.proxy.server.server.config.UsernamePasswordAuth;
 import io.le.proxy.server.utils.net.LocaleInetAddresses;
 
 import java.net.InetAddress;
@@ -26,6 +27,7 @@ public class HttpProxyServerStartup {
                     ProxyProtocolEnum.SOCKS5));
             httpProxyServerConfig.setCodecSsl(false);
             httpProxyServerConfig.setPort(40000);
+            httpProxyServerConfig.setUsernamePasswordAuth(new UsernamePasswordAuth("auh", "123123"));
             httpProxyServerConfig.setBossGroupThreads(5);
             httpProxyServerConfig.setWorkerGroupThreads(10);
             httpProxyServer.start(httpProxyServerConfig);
