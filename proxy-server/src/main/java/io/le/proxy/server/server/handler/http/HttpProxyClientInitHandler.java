@@ -1,6 +1,6 @@
 package io.le.proxy.server.server.handler.http;
 
-import io.le.proxy.server.server.config.HttpProxyServerConfig;
+import io.le.proxy.server.server.config.ProxyServerConfig;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.http.HttpClientCodec;
@@ -14,11 +14,11 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
  */
 public class HttpProxyClientInitHandler extends ChannelInitializer<Channel> {
     private final Channel proxyServerChannel;
-    private final HttpProxyServerConfig serverConfig;
+    private final ProxyServerConfig serverConfig;
     private final HttpRequestInfo httpRequestInfo;
 
 
-    public HttpProxyClientInitHandler(Channel proxyServerChannel, HttpProxyServerConfig serverConfig, HttpRequestInfo httpRequestInfo) {
+    public HttpProxyClientInitHandler(Channel proxyServerChannel, ProxyServerConfig serverConfig, HttpRequestInfo httpRequestInfo) {
         this.proxyServerChannel = proxyServerChannel;
         this.serverConfig = serverConfig;
         this.httpRequestInfo = httpRequestInfo;

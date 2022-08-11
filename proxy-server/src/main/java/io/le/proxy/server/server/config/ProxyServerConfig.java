@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @Getter
 @ToString
-public class HttpProxyServerConfig {
+public class ProxyServerConfig {
     /** 绑定的端口 */
     protected int port;
 
@@ -26,9 +26,13 @@ public class HttpProxyServerConfig {
 
     private SocketAddress localAddress;
 
+    /** 代理鉴权 */
     private UsernamePasswordAuth usernamePasswordAuth;
 
     /** 代理协议 */
     protected List<ProxyProtocolEnum> proxyProtocols = Collections.singletonList(ProxyProtocolEnum.HTTP);
+
+    /** 中继服务配置 */
+    private RelayServerConfig relayServerConfig;
 
 }

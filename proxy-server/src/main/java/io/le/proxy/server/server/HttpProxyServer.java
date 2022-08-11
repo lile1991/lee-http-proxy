@@ -1,6 +1,6 @@
 package io.le.proxy.server.server;
 
-import io.le.proxy.server.server.config.HttpProxyServerConfig;
+import io.le.proxy.server.server.config.ProxyServerConfig;
 import io.le.proxy.server.server.handler.ProxyUnificationServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -24,7 +24,7 @@ public class HttpProxyServer {
      *  绑定端口
      * @param serverConfig 服务器配置
      */
-    public void start(HttpProxyServerConfig serverConfig) {
+    public void start(ProxyServerConfig serverConfig) {
         if(!running.compareAndSet(false, true)) {
             log.error("Proxy server already running!");
         }

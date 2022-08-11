@@ -1,6 +1,6 @@
 package io.le.proxy.server.server.handler;
 
-import io.le.proxy.server.server.config.HttpProxyServerConfig;
+import io.le.proxy.server.server.config.ProxyServerConfig;
 import io.le.proxy.server.server.config.ProxyProtocolEnum;
 import io.le.proxy.server.server.handler.http.HttpProxyServerConnectionHandler;
 import io.le.proxy.server.server.handler.https.SslHandlerCreator;
@@ -17,7 +17,6 @@ import io.netty.handler.codec.socksx.v5.Socks5ServerEncoder;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 
@@ -27,9 +26,9 @@ import java.security.cert.CertificateException;
 @Slf4j
 public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter {
 
-    private final HttpProxyServerConfig serverConfig;
+    private final ProxyServerConfig serverConfig;
 
-    public ProxyUnificationServerHandler(HttpProxyServerConfig serverConfig) {
+    public ProxyUnificationServerHandler(ProxyServerConfig serverConfig) {
         this.serverConfig = serverConfig;
     }
 

@@ -1,6 +1,6 @@
 package io.le.proxy.server.server.handler.http;
 
-import io.le.proxy.server.server.config.HttpProxyServerConfig;
+import io.le.proxy.server.server.config.ProxyServerConfig;
 import io.le.proxy.server.server.config.UsernamePasswordAuth;
 import io.le.proxy.server.server.ssl.BouncyCastleCertificateGenerator;
 import io.le.proxy.server.utils.http.HttpObjectUtils;
@@ -14,7 +14,6 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -29,12 +28,12 @@ import java.util.List;
 public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapter {
 
     private HttpRequestInfo httpRequestInfo;
-    private final HttpProxyServerConfig serverConfig;
+    private final ProxyServerConfig serverConfig;
     private HttpProxyExchangeHandler httpProxyExchangeHandler;
     private ChannelFuture clientChannelFuture;
     private final List<Object> messageQueue = new ArrayList<>();
 
-    public HttpProxyServerConnectionHandler(HttpProxyServerConfig serverConfig) {
+    public HttpProxyServerConnectionHandler(ProxyServerConfig serverConfig) {
         this.serverConfig = serverConfig;
     }
 

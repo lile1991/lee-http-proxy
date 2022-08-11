@@ -3,7 +3,7 @@ package io.le;
 import io.le.proxy.server.relay.HttpProxyRelayServer;
 import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
 import io.le.proxy.server.server.HttpProxyServer;
-import io.le.proxy.server.server.config.HttpProxyServerConfig;
+import io.le.proxy.server.server.config.ProxyServerConfig;
 import io.le.proxy.server.server.config.ProxyProtocolEnum;
 import io.le.proxy.server.server.config.UsernamePasswordAuth;
 import io.le.proxy.server.utils.net.LocaleInetAddresses;
@@ -20,7 +20,7 @@ public class HttpProxyServerStartup {
         // HTTP代理(不解码HTTPS)
         {
             HttpProxyServer httpProxyServer = new HttpProxyServer();
-            HttpProxyServerConfig httpProxyServerConfig = new HttpProxyServerConfig();
+            ProxyServerConfig httpProxyServerConfig = new ProxyServerConfig();
             httpProxyServerConfig.setProxyProtocols(Arrays.asList(ProxyProtocolEnum.HTTP,
                     ProxyProtocolEnum.HTTPS,
                     ProxyProtocolEnum.SOCKS4a,
@@ -40,7 +40,7 @@ public class HttpProxyServerStartup {
             for (int i = 0, inetAddressesLength = inetAddresses.length; i < inetAddressesLength; i++) {
                 InetAddress inetAddress = inetAddresses[i];
                 HttpProxyServer httpProxyServer = new HttpProxyServer();
-                HttpProxyServerConfig httpProxyServerConfig = new HttpProxyServerConfig();
+                ProxyServerConfig httpProxyServerConfig = new ProxyServerConfig();
                 httpProxyServerConfig.setProxyProtocols(Arrays.asList(ProxyProtocolEnum.HTTP, ProxyProtocolEnum.HTTPS, ProxyProtocolEnum.LEE));
                 httpProxyServerConfig.setCodecSsl(false);
                 httpProxyServerConfig.setPort(40001 + i);
@@ -51,7 +51,7 @@ public class HttpProxyServerStartup {
             }
         } else {
             HttpProxyServer httpProxyServer = new HttpProxyServer();
-            HttpProxyServerConfig httpProxyServerConfig = new HttpProxyServerConfig();
+            ProxyServerConfig httpProxyServerConfig = new ProxyServerConfig();
             httpProxyServerConfig.setProxyProtocols(Arrays.asList(ProxyProtocolEnum.HTTP, ProxyProtocolEnum.HTTPS, ProxyProtocolEnum.LEE));
             httpProxyServerConfig.setCodecSsl(false);
             httpProxyServerConfig.setPort(40001);
@@ -65,7 +65,7 @@ public class HttpProxyServerStartup {
         {
             // HTTP代理(解码HTTPS)
             HttpProxyServer httpProxyServer = new HttpProxyServer();
-            HttpProxyServerConfig httpProxyServerConfig = new HttpProxyServerConfig();
+            ProxyServerConfig httpProxyServerConfig = new ProxyServerConfig();
             httpProxyServerConfig.setCodecSsl(true);
             httpProxyServerConfig.setPort(6666);
             httpProxyServerConfig.setBossGroupThreads(5);
@@ -76,12 +76,12 @@ public class HttpProxyServerStartup {
         {
             // HTTP代理(不解码HTTPS)
             HttpProxyServer httpProxyServer = new HttpProxyServer();
-            HttpProxyServerConfig httpProxyServerConfig = new HttpProxyServerConfig();
-            httpProxyServerConfig.setCodecSsl(false);
-            httpProxyServerConfig.setPort(7777);
-            httpProxyServerConfig.setBossGroupThreads(5);
-            httpProxyServerConfig.setWorkerGroupThreads(10);
-            httpProxyServer.start(httpProxyServerConfig);
+            ProxyServerConfig proxyServerConfig = new ProxyServerConfig();
+            proxyServerConfig.setCodecSsl(false);
+            proxyServerConfig.setPort(7777);
+            proxyServerConfig.setBossGroupThreads(5);
+            proxyServerConfig.setWorkerGroupThreads(10);
+            httpProxyServer.start(proxyServerConfig);
         }
 
         {

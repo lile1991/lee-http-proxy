@@ -1,6 +1,6 @@
 package io.le.proxy.server.relay.config;
 
-import io.le.proxy.server.server.config.HttpProxyServerConfig;
+import io.le.proxy.server.server.config.ProxyServerConfig;
 import io.le.proxy.server.server.config.ProxyProtocolEnum;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Setter
 @Getter
-public class HttpProxyRelayServerConfig extends HttpProxyServerConfig {
+public class HttpProxyRelayServerConfig extends ProxyServerConfig {
     /** */
     private String realProxyHost;
     private int realProxyPort;

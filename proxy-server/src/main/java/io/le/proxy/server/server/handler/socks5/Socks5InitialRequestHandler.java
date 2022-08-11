@@ -1,6 +1,6 @@
 package io.le.proxy.server.server.handler.socks5;
 
-import io.le.proxy.server.server.config.HttpProxyServerConfig;
+import io.le.proxy.server.server.config.ProxyServerConfig;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.socksx.SocksVersion;
@@ -9,9 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class Socks5InitialRequestHandler extends SimpleChannelInboundHandler<DefaultSocks5InitialRequest> {
-    private final HttpProxyServerConfig serverConfig;
+    private final ProxyServerConfig serverConfig;
 
-    public Socks5InitialRequestHandler(HttpProxyServerConfig serverConfig) {
+    public Socks5InitialRequestHandler(ProxyServerConfig serverConfig) {
         this.serverConfig = serverConfig;
     }
 

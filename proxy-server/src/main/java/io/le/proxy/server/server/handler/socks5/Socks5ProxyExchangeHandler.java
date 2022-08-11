@@ -1,6 +1,6 @@
 package io.le.proxy.server.server.handler.socks5;
 
-import io.le.proxy.server.server.config.HttpProxyServerConfig;
+import io.le.proxy.server.server.config.ProxyServerConfig;
 import io.le.proxy.server.utils.http.HttpObjectUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,10 +12,10 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class Socks5ProxyExchangeHandler extends ChannelInboundHandlerAdapter {
-    private final HttpProxyServerConfig serverConfig;
+    private final ProxyServerConfig serverConfig;
     private final Channel exchangeChannel;
 
-    public Socks5ProxyExchangeHandler(HttpProxyServerConfig serverConfig, Channel exchangeChannel) {
+    public Socks5ProxyExchangeHandler(ProxyServerConfig serverConfig, Channel exchangeChannel) {
         this.serverConfig = serverConfig;
         this.exchangeChannel = exchangeChannel;
     }
