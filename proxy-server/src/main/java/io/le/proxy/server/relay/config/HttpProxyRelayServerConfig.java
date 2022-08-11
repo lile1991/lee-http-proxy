@@ -1,6 +1,7 @@
 package io.le.proxy.server.relay.config;
 
 import io.le.proxy.server.server.config.HttpProxyServerConfig;
+import io.le.proxy.server.server.config.ProxyProtocolEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +17,7 @@ public class HttpProxyRelayServerConfig extends HttpProxyServerConfig {
     private String proxyPassword;
 
     /** 中继协议 */
-    private ProxyProtocol relayProtocol = ProxyProtocol.HTTP;
+    private ProxyProtocolEnum relayProtocol = ProxyProtocolEnum.HTTP;
 
     /** 中继器规则配置 */
     private ReplayRuleConfig replayRuleConfig;

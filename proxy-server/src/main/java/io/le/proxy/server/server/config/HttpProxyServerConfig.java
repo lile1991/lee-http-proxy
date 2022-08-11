@@ -6,6 +6,8 @@ import lombok.Setter;
 
 import java.net.InetAddress;
 import java.net.SocketAddress;
+import java.util.Collections;
+import java.util.List;
 
 @Setter
 @Getter
@@ -25,9 +27,6 @@ public class HttpProxyServerConfig {
     private SocketAddress localAddress;
 
     /** 代理协议 */
-    protected ProxyProtocol proxyProtocol = ProxyProtocol.HTTP;
+    protected List<ProxyProtocolEnum> proxyProtocols = Collections.singletonList(ProxyProtocolEnum.HTTP);
 
-    public enum ProxyProtocol {
-        HTTP, HTTPS, LEE
-    }
 }
