@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class HttpProxyRelayServer {
 
-    private AtomicBoolean running = new AtomicBoolean(false);
+    private final AtomicBoolean running = new AtomicBoolean(false);
 
     /**
      * 启动代理中继服务器
