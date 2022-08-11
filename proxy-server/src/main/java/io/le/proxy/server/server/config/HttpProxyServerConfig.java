@@ -1,10 +1,8 @@
 package io.le.proxy.server.server.config;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.util.Collections;
 import java.util.List;

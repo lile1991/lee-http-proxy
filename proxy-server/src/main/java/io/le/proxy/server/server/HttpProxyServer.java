@@ -2,14 +2,11 @@ package io.le.proxy.server.server;
 
 import io.le.proxy.server.server.config.HttpProxyServerConfig;
 import io.le.proxy.server.server.handler.ProxyUnificationServerHandler;
-import io.le.proxy.server.server.handler.HttpProxyServerConnectionHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpServerCodec;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLException;
@@ -36,10 +33,7 @@ public class HttpProxyServer {
                     protected void initChannel(Channel ch) throws CertificateException, SSLException {
                         ch.pipeline()
                             // .addLast(new LoggingHandler())
-                            .addLast(new ProxyUnificationServerHandler(serverConfig))
-                            .addLast(new HttpServerCodec())
-                            .addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()))
-                            .addLast(new HttpProxyServerConnectionHandler(serverConfig));
+                            .addLast(new ProxyUnificationServerHandler(serverConfig));
                     }
                 }).bind(serverConfig.getPort());
     }

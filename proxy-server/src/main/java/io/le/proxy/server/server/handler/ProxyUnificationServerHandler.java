@@ -1,10 +1,14 @@
 package io.le.proxy.server.server.handler;
 
-import io.le.proxy.server.relay.handler.codec.lee.LeeServerCodec;
 import io.le.proxy.server.server.config.HttpProxyServerConfig;
 import io.le.proxy.server.server.config.ProxyProtocolEnum;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http2.Http2SecurityUtil;
 import io.netty.handler.codec.socksx.SocksVersion;
 import io.netty.handler.codec.socksx.v4.Socks4ServerDecoder;
@@ -25,7 +29,7 @@ import java.security.cert.CertificateException;
 @Slf4j
 public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter {
 
-    private HttpProxyServerConfig serverConfig;
+    private final HttpProxyServerConfig serverConfig;
 
     public ProxyUnificationServerHandler(HttpProxyServerConfig serverConfig) {
         this.serverConfig = serverConfig;
@@ -46,6 +50,7 @@ public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter 
 
         ChannelPipeline p = ctx.pipeline();
         switch (protocol) {
+            case HTTP: addHttpSupport(ctx); break;
             case HTTPS: addHttpsSupport(ctx); break;
             case SOCKS4a:
                 p.addAfter(ctx.name(), null, Socks4ServerEncoder.INSTANCE);
@@ -91,6 +96,12 @@ public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter 
         }
     }
 
+    public void addHttpSupport(ChannelHandlerContext ctx) throws SSLException, CertificateException {
+        ctx.pipeline()
+                .addLast(new HttpServerCodec())
+                .addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()))
+                .addLast(new HttpProxyServerConnectionHandler(serverConfig));
+    }
     public void addHttpsSupport(ChannelHandlerContext ctx) throws SSLException, CertificateException {
         Channel ch = ctx.channel();
 
@@ -114,5 +125,7 @@ public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter 
                         ApplicationProtocolNames.HTTP_1_1))
                 .build();
         ch.pipeline().addAfter(ctx.name(), null, sslCtx.newHandler(ch.alloc()));
+
+        addHttpSupport(ctx);
     }
 }
