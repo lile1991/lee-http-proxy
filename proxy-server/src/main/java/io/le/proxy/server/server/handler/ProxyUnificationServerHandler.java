@@ -128,6 +128,7 @@ public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter 
         // Support HTTPS proxy protocol
         ch.pipeline().addAfter(ctx.name(), null, SslHandlerCreator.forServer(ch.alloc()));
 
+        // 和HTTP代理协议共用一样的Handler
         addHttpHandles(ctx);
     }
 }

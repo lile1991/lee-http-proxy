@@ -18,9 +18,8 @@ public class Socks5ProxyServerConnectionHandler extends SimpleChannelInboundHand
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, DefaultSocks5CommandRequest msg) throws Exception {
-        log.debug("目标服务器  : " + msg.type() + "," + msg.dstAddr() + "," + msg.dstPort());
         if(msg.type().equals(Socks5CommandType.CONNECT)) {
-            log.trace("准备连接目标服务器");
+            log.trace("Prepare to connect to the target server {}:{}", msg.dstAddr(), msg.dstPort());
 
             Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(ctx.channel().eventLoop())
@@ -28,30 +27,26 @@ public class Socks5ProxyServerConnectionHandler extends SimpleChannelInboundHand
                     .option(ChannelOption.TCP_NODELAY, true)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            //ch.pipeline().addLast(new LoggingHandler());//in out
-                            //将目标服务器信息转发给客户端
+                        protected void initChannel(SocketChannel ch) {
+                            // 将目标服务器信息转发给客户端
                             ch.pipeline().addLast(new Socks5ProxyExchangeHandler(serverConfig, ctx.channel()));
                         }
                     });
-            log.trace("连接目标服务器");
             ChannelFuture future = bootstrap.connect(msg.dstAddr(), msg.dstPort());
-            future.addListener(new ChannelFutureListener() {
-
-                public void operationComplete(final ChannelFuture future) throws Exception {
-                    Channel clientChannel = future.channel();
-                    if(future.isSuccess()) {
-                        log.debug("{} Successfully connected to {}:{}!", clientChannel, msg.dstAddr(), msg.dstPort());
-                        ctx.pipeline().addLast(new Socks5ProxyExchangeHandler(serverConfig, clientChannel));
-                        Socks5CommandResponse commandResponse = new DefaultSocks5CommandResponse(Socks5CommandStatus.SUCCESS, Socks5AddressType.IPv4);
-                        ctx.writeAndFlush(commandResponse);
-                    } else {
-                        Socks5CommandResponse commandResponse = new DefaultSocks5CommandResponse(Socks5CommandStatus.FAILURE, Socks5AddressType.IPv4);
-                        ctx.writeAndFlush(commandResponse);
-                    }
+            future.addListener((ChannelFutureListener) future1 -> {
+                Channel clientChannel = future1.channel();
+                if(future1.isSuccess()) {
+                    log.debug("{} Successfully connected to {}:{}!", clientChannel, msg.dstAddr(), msg.dstPort());
+                    ctx.pipeline().addLast(new Socks5ProxyExchangeHandler(serverConfig, clientChannel));
+                    Socks5CommandResponse commandResponse = new DefaultSocks5CommandResponse(Socks5CommandStatus.SUCCESS, Socks5AddressType.IPv4);
+                    ctx.writeAndFlush(commandResponse);
+                } else {
+                    Socks5CommandResponse commandResponse = new DefaultSocks5CommandResponse(Socks5CommandStatus.FAILURE, Socks5AddressType.IPv4);
+                    ctx.writeAndFlush(commandResponse);
                 }
-
             });
+
+            ctx.pipeline().remove(ctx.name());
         } else {
             log.warn("Socks5 channelRead0 {}", msg);
             ctx.fireChannelRead(msg);
