@@ -102,8 +102,8 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
         String proxyAuthorization = request.headers().get("Proxy-Authorization");
         if(serverConfig.getUsernamePasswordAuth() != null) {
             if(proxyAuthorization == null || proxyAuthorization.isEmpty()) {
-                response407ProxyAuthenticationRequired(ctx, request, "Please provide Proxy-Authorization");
-                ctx.close();
+                response407ProxyAuthenticationRequired(ctx, request, "Please provide Proxy-Authorization")
+                        .addListener(ChannelFutureListener.CLOSE);
                 return null;
             }
 
@@ -111,8 +111,8 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
             String usernamePassword = usernamePasswordAuth.getUsername() + ":" + usernamePasswordAuth.getPassword();
 
             if(!proxyAuthorization.equals("Basic " + Base64.getEncoder().encodeToString(usernamePassword.getBytes(StandardCharsets.UTF_8)))) {
-                response407ProxyAuthenticationRequired(ctx, request, "Incorrect proxy username or password");
-                ctx.close();
+                response407ProxyAuthenticationRequired(ctx, request, "Incorrect proxy username or password")
+                        .addListener(ChannelFutureListener.CLOSE);
                 return null;
             }
         }
@@ -191,12 +191,12 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
     }
 
 
-    private void response407ProxyAuthenticationRequired(ChannelHandlerContext ctx, HttpRequest request, String reasonPhrase) {
+    private ChannelFuture response407ProxyAuthenticationRequired(ChannelHandlerContext ctx, HttpRequest request, String reasonPhrase) {
         FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(request.protocolVersion(),
                 new HttpResponseStatus(HttpResponseStatus.PROXY_AUTHENTICATION_REQUIRED.code(),
                         reasonPhrase)
         );
         fullHttpResponse.headers().set(HttpHeaderNames.PROXY_AUTHENTICATE, "Basic realm=\"Access to the staging site\"");
-        ctx.writeAndFlush(fullHttpResponse);
+        return ctx.writeAndFlush(fullHttpResponse);
     }
 }

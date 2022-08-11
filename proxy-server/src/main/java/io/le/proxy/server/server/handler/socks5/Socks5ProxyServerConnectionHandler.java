@@ -17,7 +17,7 @@ public class Socks5ProxyServerConnectionHandler extends SimpleChannelInboundHand
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, DefaultSocks5CommandRequest msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, DefaultSocks5CommandRequest msg) {
         if(msg.type().equals(Socks5CommandType.CONNECT)) {
             log.trace("Prepare to connect to the target server {}:{}", msg.dstAddr(), msg.dstPort());
 
@@ -40,6 +40,8 @@ public class Socks5ProxyServerConnectionHandler extends SimpleChannelInboundHand
                     ctx.pipeline().addLast(new Socks5ProxyExchangeHandler(serverConfig, clientChannel));
                     Socks5CommandResponse commandResponse = new DefaultSocks5CommandResponse(Socks5CommandStatus.SUCCESS, Socks5AddressType.IPv4);
                     ctx.writeAndFlush(commandResponse);
+
+                    ctx.pipeline().remove(Socks5ServerEncoder.class);
                 } else {
                     Socks5CommandResponse commandResponse = new DefaultSocks5CommandResponse(Socks5CommandStatus.FAILURE, Socks5AddressType.IPv4);
                     ctx.writeAndFlush(commandResponse);

@@ -22,18 +22,19 @@ public class Socks5InitialRequestHandler extends SimpleChannelInboundHandler<Def
             ctx.close();
         } else {
             if(msg.version().equals(SocksVersion.SOCKS5)) {
-                // if(serverConfig.isAuth()) {
-                //     Socks5InitialResponse initialResponse = new DefaultSocks5InitialResponse(Socks5AuthMethod.PASSWORD);
-                //     ctx.writeAndFlush(initialResponse);
-                //     // socks auth
-                //     ch.pipeline().addLast(new Socks5PasswordAuthRequestDecoder());
-                //     // socks auth
-                //     ch.pipeline().addLast(new Socks5PasswordAuthRequestHandler(getPasswordAuth()));
-                // } else {
+                if(serverConfig.getUsernamePasswordAuth() != null) {
+                    Socks5InitialResponse initialResponse = new DefaultSocks5InitialResponse(Socks5AuthMethod.PASSWORD);
+                    ctx.writeAndFlush(initialResponse);
+                    // socks auth message decoder
+                    ctx.pipeline().addLast(new Socks5PasswordAuthRequestDecoder());
+                    // socks auth
+                    ctx.pipeline().addLast(new Socks5PasswordAuthRequestHandler(serverConfig.getUsernamePasswordAuth()));
+                } else {
                     Socks5InitialResponse initialResponse = new DefaultSocks5InitialResponse(Socks5AuthMethod.NO_AUTH);
                     ctx.writeAndFlush(initialResponse);
-                    ctx.pipeline().remove(ctx.name());
-                // }
+                }
+                ctx.pipeline().remove(Socks5InitialRequestDecoder.class);
+                ctx.pipeline().remove(ctx.name());
 
                 //socks connection
                 ctx.pipeline().addLast(new Socks5CommandRequestDecoder());
