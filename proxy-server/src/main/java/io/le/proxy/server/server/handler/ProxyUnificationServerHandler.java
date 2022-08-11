@@ -4,6 +4,7 @@ import io.le.proxy.server.server.config.HttpProxyServerConfig;
 import io.le.proxy.server.server.config.ProxyProtocolEnum;
 import io.le.proxy.server.server.handler.http.HttpProxyServerConnectionHandler;
 import io.le.proxy.server.server.handler.https.SslHandlerCreator;
+import io.le.proxy.server.server.handler.socks5.Socks5InitialRequestHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -11,17 +12,11 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.codec.http2.Http2SecurityUtil;
 import io.netty.handler.codec.socksx.SocksVersion;
 import io.netty.handler.codec.socksx.v4.Socks4ServerDecoder;
 import io.netty.handler.codec.socksx.v4.Socks4ServerEncoder;
-import io.netty.handler.codec.socksx.v5.Socks5CommandRequestDecoder;
 import io.netty.handler.codec.socksx.v5.Socks5InitialRequestDecoder;
-import io.netty.handler.codec.socksx.v5.Socks5PasswordAuthRequestDecoder;
 import io.netty.handler.codec.socksx.v5.Socks5ServerEncoder;
-import io.netty.handler.ssl.*;
-import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import io.netty.handler.ssl.util.SelfSignedCertificate;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLException;
@@ -82,17 +77,17 @@ public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter 
         // sock5 init
         p.addAfter(ctx.name(), null, new Socks5InitialRequestDecoder());
         // sock5 init
-        /*ch.pipeline().addLast(new Socks5InitialRequestHandler(ProxyServer.this));
-        if(isAuth()) {
+        ch.pipeline().addLast(new Socks5InitialRequestHandler(serverConfig));
+        /*if(isAuth()) {
             //socks auth
             ch.pipeline().addLast(new Socks5PasswordAuthRequestDecoder());
             //socks auth
             ch.pipeline().addLast(new Socks5PasswordAuthRequestHandler(getPasswordAuth()));
-        }
-        // socks connection
-        ch.pipeline().addLast(new Socks5CommandRequestDecoder());
-        // Socks connection
-        ch.pipeline().addLast(new Socks5CommandRequestHandler(ProxyServer.this.getBossGroup()));*/
+        }*/
+        // // socks connection
+        // ch.pipeline().addLast(new Socks5CommandRequestDecoder());
+        // // Socks connection
+        // ch.pipeline().addLast(new Socks5CommandRequestHandler(ProxyServer.this.getBossGroup()));
     }
 
     private static void logKnownVersion(ChannelHandlerContext ctx, ProxyProtocolEnum version) {
