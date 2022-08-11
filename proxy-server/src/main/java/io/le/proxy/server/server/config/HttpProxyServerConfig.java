@@ -1,14 +1,16 @@
 package io.le.proxy.server.server.config;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
-import java.net.InetAddress;
 import java.net.SocketAddress;
+import java.util.Collections;
+import java.util.List;
 
 @Setter
 @Getter
+@ToString
 public class HttpProxyServerConfig {
     /** 绑定的端口 */
     protected int port;
@@ -24,10 +26,9 @@ public class HttpProxyServerConfig {
 
     private SocketAddress localAddress;
 
-    /** 代理协议 */
-    protected ProxyProtocol proxyProtocol = ProxyProtocol.HTTP;
+    private UsernamePasswordAuth usernamePasswordAuth;
 
-    public enum ProxyProtocol {
-        HTTP, HTTPS, LEE
-    }
+    /** 代理协议 */
+    protected List<ProxyProtocolEnum> proxyProtocols = Collections.singletonList(ProxyProtocolEnum.HTTP);
+
 }

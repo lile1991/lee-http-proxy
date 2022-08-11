@@ -2,8 +2,8 @@ package io.le.proxy.server.relay.handler;
 
 import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
 import io.le.proxy.server.relay.config.ReplayRuleConfig;
-import io.le.proxy.server.server.handler.HttpProxyServerConnectionHandler;
-import io.le.proxy.server.server.handler.HttpRequestInfo;
+import io.le.proxy.server.server.handler.http.HttpProxyServerConnectionHandler;
+import io.le.proxy.server.server.handler.http.HttpRequestInfo;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.HttpRequest;

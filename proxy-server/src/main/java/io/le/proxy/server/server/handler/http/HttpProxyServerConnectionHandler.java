@@ -1,7 +1,9 @@
-package io.le.proxy.server.server.handler;
+package io.le.proxy.server.server.handler.http;
 
 import io.le.proxy.server.server.config.HttpProxyServerConfig;
+import io.le.proxy.server.server.config.UsernamePasswordAuth;
 import io.le.proxy.server.server.ssl.BouncyCastleCertificateGenerator;
+import io.le.proxy.server.utils.http.HttpObjectUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -12,10 +14,11 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -27,7 +30,7 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
 
     private HttpRequestInfo httpRequestInfo;
     private final HttpProxyServerConfig serverConfig;
-    private HttpProxyServerDispatcherHandler httpProxyServerDispatcherHandler;
+    private HttpProxyExchangeHandler httpProxyExchangeHandler;
     private ChannelFuture clientChannelFuture;
     private final List<Object> messageQueue = new ArrayList<>();
 
@@ -58,7 +61,7 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
                 // 建立或获取远端站点的连接， 转发数据
                 clientChannelFuture = channelReadHttpRequest(ctx, (HttpRequest) msg);
             } else {
-                log.error("收到莫名为消息: {}", msg);
+                log.error("Unexpected packet: {}", HttpObjectUtils.stringOf(msg));
             }
         } else {
             /*if(msg instanceof LastHttpContent) {
@@ -83,13 +86,13 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
             }
 
             synchronized (messageQueue) {
-                if (httpProxyServerDispatcherHandler == null) {
+                if (httpProxyExchangeHandler == null) {
                     // 远端连接尚未建立， 消息暂存到队列中
                     // 在连接成功后（clientChannelFuture.addListener 被调用）， messageQueue会被一次性全部转发并清空
                     messageQueue.add(msg);
                 } else {
                     // 远程连接已经建立， 直接交给DispatcherHandler转发
-                    httpProxyServerDispatcherHandler.channelRead(ctx, msg);
+                    httpProxyExchangeHandler.channelRead(ctx, msg);
                 }
             }
         }
@@ -97,10 +100,22 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
 
     private ChannelFuture channelReadHttpRequest(ChannelHandlerContext ctx, HttpRequest request) {
         String proxyAuthorization = request.headers().get("Proxy-Authorization");
-        /*if(proxyAuthorization == null || proxyAuthorization.isEmpty()) {
-            response407ProxyAuthenticationRequired(ctx, request);
-            return null;
-        }*/
+        if(serverConfig.getUsernamePasswordAuth() != null) {
+            if(proxyAuthorization == null || proxyAuthorization.isEmpty()) {
+                response407ProxyAuthenticationRequired(ctx, request, "Please provide Proxy-Authorization")
+                        .addListener(ChannelFutureListener.CLOSE);
+                return null;
+            }
+
+            UsernamePasswordAuth usernamePasswordAuth = serverConfig.getUsernamePasswordAuth();
+            String usernamePassword = usernamePasswordAuth.getUsername() + ":" + usernamePasswordAuth.getPassword();
+
+            if(!proxyAuthorization.equals("Basic " + Base64.getEncoder().encodeToString(usernamePassword.getBytes(StandardCharsets.UTF_8)))) {
+                response407ProxyAuthenticationRequired(ctx, request, "Incorrect proxy username or password")
+                        .addListener(ChannelFutureListener.CLOSE);
+                return null;
+            }
+        }
 
         if(request.method() == HttpMethod.CONNECT) {
             response200ProxyEstablished(ctx, request);
@@ -147,13 +162,13 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
                         // 移除Connect
                         ctx.pipeline().remove(HttpProxyServerConnectionHandler.class);
                         // 添加Dispatcher
-                        httpProxyServerDispatcherHandler = new HttpProxyServerDispatcherHandler(serverConfig, httpRequestInfo, clientChannel);
-                        ctx.pipeline().addLast(httpProxyServerDispatcherHandler);
+                        httpProxyExchangeHandler = new HttpProxyExchangeHandler(serverConfig, clientChannel);
+                        ctx.pipeline().addLast(httpProxyExchangeHandler);
                     }
 
                     // 消费掉消息队列
                     for (Object msg : messageQueue) {
-                        httpProxyServerDispatcherHandler.channelRead(ctx, msg);
+                        httpProxyExchangeHandler.channelRead(ctx, msg);
                     }
                     messageQueue.clear();
                 }
@@ -176,12 +191,12 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
     }
 
 
-    private void response407ProxyAuthenticationRequired(ChannelHandlerContext ctx, HttpRequest request) {
+    private ChannelFuture response407ProxyAuthenticationRequired(ChannelHandlerContext ctx, HttpRequest request, String reasonPhrase) {
         FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(request.protocolVersion(),
                 new HttpResponseStatus(HttpResponseStatus.PROXY_AUTHENTICATION_REQUIRED.code(),
-                        "Please provide Proxy-Authorization, sample: RELAY:host:port:username:password or DIRECT:username:password")
+                        reasonPhrase)
         );
         fullHttpResponse.headers().set(HttpHeaderNames.PROXY_AUTHENTICATE, "Basic realm=\"Access to the staging site\"");
-        ctx.writeAndFlush(fullHttpResponse);
+        return ctx.writeAndFlush(fullHttpResponse);
     }
 }

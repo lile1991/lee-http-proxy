@@ -3,7 +3,7 @@ package io.le.proxy.server.relay;
 import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
 import io.le.proxy.server.relay.handler.HttpRelayFilterHandler;
 import io.le.proxy.server.relay.handler.codec.lee.LeeServerCodec;
-import io.le.proxy.server.server.config.HttpProxyServerConfig;
+import io.le.proxy.server.server.config.ProxyProtocolEnum;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -40,8 +40,8 @@ public class HttpProxyRelayServer {
                 .childHandler(new ChannelInitializer<Channel>() {
                     @Override
                     protected void initChannel(Channel ch) {
-                        switch (serverConfig.getProxyProtocol()) {
-                            case LEE: ch.pipeline().addLast(new LeeServerCodec()); break;
+                        if (serverConfig.getProxyProtocols().contains(ProxyProtocolEnum.LEE)) {
+                            ch.pipeline().addLast(new LeeServerCodec());
                         }
 
                         ch.pipeline()
