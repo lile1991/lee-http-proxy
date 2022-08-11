@@ -29,10 +29,6 @@ public class HttpProxyProtocolHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        // HTTPS 22
-        // HTTP 67
-        // SOCKS 67
-        System.out.println(((ByteBuf) msg).getByte(0));
         ProxyProtocolEnum protocol = parseProxyProtocol((ByteBuf) msg);
         if(protocol == null) {
             return;
@@ -43,7 +39,7 @@ public class HttpProxyProtocolHandler extends ChannelInboundHandlerAdapter {
         }
 
         if (serverConfig.getProxyProtocols().contains(ProxyProtocolEnum.LEE)) {
-            ctx.pipeline().addLast(new LeeServerCodec());
+            ctx.pipeline().addBefore(ctx.name(), null, new LeeServerCodec());
         }
 
         ctx.pipeline().remove(getClass());
@@ -56,6 +52,9 @@ public class HttpProxyProtocolHandler extends ChannelInboundHandlerAdapter {
         if(writerIndex == readerIndex) {
             return null;
         }
+        // HTTPS 22
+        // SOCKS ?
+        // HTTP 67 //
         byte firstByte = msg.getByte(readerIndex);
         return firstByte == 22 ? ProxyProtocolEnum.HTTPS : ProxyProtocolEnum.HTTP;
     }
@@ -86,6 +85,6 @@ public class HttpProxyProtocolHandler extends ChannelInboundHandlerAdapter {
                         ApplicationProtocolNames.HTTP_2,
                         ApplicationProtocolNames.HTTP_1_1))
                 .build();
-        ch.pipeline().addAfter(ctx.name(), "", sslCtx.newHandler(ch.alloc()));
+        ch.pipeline().addAfter(ctx.name(), null, sslCtx.newHandler(ch.alloc()));
     }
 }

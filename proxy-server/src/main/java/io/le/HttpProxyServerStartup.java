@@ -44,6 +44,15 @@ public class HttpProxyServerStartup {
                 httpProxyServerConfig.setLocalAddress(new InetSocketAddress(inetAddress, 45000 + random.nextInt(5000)));
                 httpProxyServer.start(httpProxyServerConfig);
             }
+        } else {
+            HttpProxyServer httpProxyServer = new HttpProxyServer();
+            HttpProxyServerConfig httpProxyServerConfig = new HttpProxyServerConfig();
+            httpProxyServerConfig.setProxyProtocols(Arrays.asList(ProxyProtocolEnum.HTTP, ProxyProtocolEnum.HTTPS, ProxyProtocolEnum.LEE));
+            httpProxyServerConfig.setCodecSsl(false);
+            httpProxyServerConfig.setPort(40001);
+            httpProxyServerConfig.setBossGroupThreads(5);
+            httpProxyServerConfig.setWorkerGroupThreads(10);
+            httpProxyServer.start(httpProxyServerConfig);
         }
     }
 
