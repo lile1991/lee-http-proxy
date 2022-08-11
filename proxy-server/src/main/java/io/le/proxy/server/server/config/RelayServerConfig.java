@@ -18,5 +18,5 @@ public class RelayServerConfig {
     private UsernamePasswordAuth relayUsernamePasswordAuth;
 
     /** 中继器规则配置 */
-    private ReplayRuleConfig replayRuleConfig;
+    private ReplayRuleConfig replayRuleConfig = new ReplayRuleConfig();
 }

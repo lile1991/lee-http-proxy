@@ -3,9 +3,7 @@ package io.le;
 import io.le.proxy.server.relay.HttpProxyRelayServer;
 import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
 import io.le.proxy.server.server.HttpProxyServer;
-import io.le.proxy.server.server.config.ProxyServerConfig;
-import io.le.proxy.server.server.config.ProxyProtocolEnum;
-import io.le.proxy.server.server.config.UsernamePasswordAuth;
+import io.le.proxy.server.server.config.*;
 import io.le.proxy.server.utils.net.LocaleInetAddresses;
 
 import java.net.InetAddress;
@@ -30,6 +28,29 @@ public class HttpProxyServerStartup {
             httpProxyServerConfig.setUsernamePasswordAuth(new UsernamePasswordAuth("auh", "123123"));
             httpProxyServerConfig.setBossGroupThreads(5);
             httpProxyServerConfig.setWorkerGroupThreads(10);
+
+            httpProxyServer.start(httpProxyServerConfig);
+        }
+
+        // HTTP代理(不解码HTTPS)
+        {
+            HttpProxyServer httpProxyServer = new HttpProxyServer();
+            ProxyServerConfig httpProxyServerConfig = new ProxyServerConfig();
+            httpProxyServerConfig.setProxyProtocols(Arrays.asList(ProxyProtocolEnum.HTTP,
+                    ProxyProtocolEnum.HTTPS,
+                    ProxyProtocolEnum.SOCKS4a,
+                    ProxyProtocolEnum.SOCKS5));
+            httpProxyServerConfig.setCodecSsl(false);
+            httpProxyServerConfig.setPort(40001);
+            httpProxyServerConfig.setUsernamePasswordAuth(new UsernamePasswordAuth("auh", "123123"));
+            httpProxyServerConfig.setBossGroupThreads(5);
+            httpProxyServerConfig.setWorkerGroupThreads(10);
+
+            RelayServerConfig relayServerConfig = new RelayServerConfig();
+            relayServerConfig.setRelayProtocol(ProxyProtocolEnum.HTTP);
+            relayServerConfig.setRelayNetAddress(new NetAddress("127.0.0.1", 40000));
+            httpProxyServerConfig.setRelayServerConfig(relayServerConfig);
+
             httpProxyServer.start(httpProxyServerConfig);
         }
 
@@ -43,7 +64,7 @@ public class HttpProxyServerStartup {
                 ProxyServerConfig httpProxyServerConfig = new ProxyServerConfig();
                 httpProxyServerConfig.setProxyProtocols(Arrays.asList(ProxyProtocolEnum.HTTP, ProxyProtocolEnum.HTTPS, ProxyProtocolEnum.LEE));
                 httpProxyServerConfig.setCodecSsl(false);
-                httpProxyServerConfig.setPort(40001 + i);
+                httpProxyServerConfig.setPort(40002 + i);
                 httpProxyServerConfig.setBossGroupThreads(5);
                 httpProxyServerConfig.setWorkerGroupThreads(10);
                 httpProxyServerConfig.setLocalAddress(new InetSocketAddress(inetAddress, 45000 + random.nextInt(5000)));
@@ -52,9 +73,9 @@ public class HttpProxyServerStartup {
         } else {
             HttpProxyServer httpProxyServer = new HttpProxyServer();
             ProxyServerConfig httpProxyServerConfig = new ProxyServerConfig();
-            httpProxyServerConfig.setProxyProtocols(Arrays.asList(ProxyProtocolEnum.HTTP, ProxyProtocolEnum.HTTPS, ProxyProtocolEnum.LEE));
+            httpProxyServerConfig.setProxyProtocols(Arrays.asList(ProxyProtocolEnum.HTTP, ProxyProtocolEnum.HTTPS));
             httpProxyServerConfig.setCodecSsl(false);
-            httpProxyServerConfig.setPort(40001);
+            httpProxyServerConfig.setPort(40002);
             httpProxyServerConfig.setBossGroupThreads(5);
             httpProxyServerConfig.setWorkerGroupThreads(10);
             httpProxyServer.start(httpProxyServerConfig);
