@@ -21,9 +21,9 @@ public class Socks5ProxyExchangeHandler extends ChannelInboundHandlerAdapter {
     }
 
     /**
-     * 从远程服务端读取数据, 转发给客户端
-     * @param ctx 连远程服务器
-     * @param msg HttpResponse数据
+     * 将读取到的数据转发
+     * @param ctx channel
+     * @param msg 数据包
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
