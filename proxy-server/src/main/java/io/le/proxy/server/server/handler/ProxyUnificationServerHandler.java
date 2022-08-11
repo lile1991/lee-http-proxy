@@ -81,9 +81,10 @@ public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter 
         if(writerIndex == readerIndex) {
             return null;
         }
+        // HTTP 67
         // HTTPS 22
-        // SOCKS ?
-        // HTTP 67 //
+        // SOCKS4 4
+        // SOCKS5 5
         byte versionVal = msg.getByte(readerIndex);
         SocksVersion socksVersion = SocksVersion.valueOf(versionVal);
         switch (socksVersion) {
