@@ -96,7 +96,7 @@ public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter 
         }
     }
 
-    public void addHttpSupport(ChannelHandlerContext ctx) throws SSLException, CertificateException {
+    public void addHttpSupport(ChannelHandlerContext ctx) {
         ctx.pipeline()
                 .addLast(new HttpServerCodec())
                 .addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()))
