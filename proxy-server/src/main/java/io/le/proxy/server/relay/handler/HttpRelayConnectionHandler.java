@@ -1,7 +1,7 @@
 package io.le.proxy.server.relay.handler;
 
 import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
-import io.le.proxy.server.server.handler.HttpRequestInfo;
+import io.le.proxy.server.server.handler.http.HttpRequestInfo;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;

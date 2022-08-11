@@ -3,7 +3,7 @@ package io.le.proxy.server.relay.handler;
 import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
 import io.le.proxy.server.relay.handler.codec.lee.LeeClientCodec;
 import io.le.proxy.server.server.config.ProxyProtocolEnum;
-import io.le.proxy.server.server.handler.HttpRequestInfo;
+import io.le.proxy.server.server.handler.http.HttpRequestInfo;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.http.HttpClientCodec;

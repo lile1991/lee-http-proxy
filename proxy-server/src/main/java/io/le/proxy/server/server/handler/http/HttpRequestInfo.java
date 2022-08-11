@@ -1,4 +1,4 @@
-package io.le.proxy.server.server.handler;
+package io.le.proxy.server.server.handler.http;
 
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;

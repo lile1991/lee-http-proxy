@@ -1,4 +1,4 @@
-package io.le.proxy.server.server.handler;
+package io.le.proxy.server.server.handler.http;
 
 import io.le.proxy.server.server.config.HttpProxyServerConfig;
 import io.le.proxy.server.utils.http.HttpObjectUtils;
