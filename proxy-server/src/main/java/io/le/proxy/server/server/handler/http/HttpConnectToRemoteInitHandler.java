@@ -13,22 +13,24 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 /**
  * 与目标网站的Handler
  */
-public class HttpProxyClientInitHandler extends ChannelInitializer<Channel> {
+public class HttpConnectToRemoteInitHandler extends ChannelInitializer<Channel> {
     private final Channel proxyServerChannel;
     private final ProxyServerConfig serverConfig;
     private final HttpRequestInfo httpRequestInfo;
 
 
-    public HttpProxyClientInitHandler(Channel proxyServerChannel, ProxyServerConfig serverConfig, HttpRequestInfo httpRequestInfo) {
+    public HttpConnectToRemoteInitHandler(Channel proxyServerChannel, ProxyServerConfig serverConfig, HttpRequestInfo httpRequestInfo) {
         this.proxyServerChannel = proxyServerChannel;
         this.serverConfig = serverConfig;
         this.httpRequestInfo = httpRequestInfo;
     }
 
     @Override
-    protected void initChannel(Channel ch) throws Exception {
+    protected void initChannel(Channel ch) {
         // ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
-        if(httpRequestInfo.isSsl()) {
+
+        // 解码器放到HttpConnectToRemoteHandler去添加
+        /*if(httpRequestInfo.isSsl()) {
             if(serverConfig.isCodecMsg()) {
                 SslContext sslCtx = SslContextBuilder
                         .forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
@@ -41,7 +43,7 @@ public class HttpProxyClientInitHandler extends ChannelInitializer<Channel> {
             // ch.pipeline().addLast(new HttpContentDecompressor());
             ch.pipeline().addLast(new HttpClientCodec());
             ch.pipeline().addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
-        }
-        ch.pipeline().addLast(new ProxyExchangeHandler(serverConfig, proxyServerChannel));
+        }*/
+        ch.pipeline().addLast(HttpConnectToRemoteInitHandler.class.getSimpleName(), new ProxyExchangeHandler(serverConfig, proxyServerChannel));
     }
 }

@@ -2,7 +2,7 @@ package io.le.proxy.server.relay.handler.http;
 
 import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
 import io.le.proxy.server.relay.config.ReplayRuleConfig;
-import io.le.proxy.server.server.handler.http.HttpProxyServerConnectionHandler;
+import io.le.proxy.server.server.handler.http.HttpAcceptConnectHandler;
 import io.le.proxy.server.server.handler.http.HttpRequestInfo;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -40,9 +40,9 @@ public class HttpRelayFilterHandler extends ChannelInboundHandlerAdapter {
 
         if(isDirect(requestInfo)) {
             log.debug("Host {} go direct!", remoteHost);
-            HttpProxyServerConnectionHandler httpProxyServerConnectionHandler = new HttpProxyServerConnectionHandler(serverConfig);
-            ctx.pipeline().addLast(httpProxyServerConnectionHandler);
-            httpProxyServerConnectionHandler.channelRead(ctx, request);
+            HttpAcceptConnectHandler httpAcceptConnectHandler = new HttpAcceptConnectHandler(serverConfig);
+            ctx.pipeline().addLast(httpAcceptConnectHandler);
+            httpAcceptConnectHandler.channelRead(ctx, request);
         } else {
             HttpRelayConnectionHandler httpRelayConnectionHandler = new HttpRelayConnectionHandler(serverConfig);
             ctx.pipeline().addLast(httpRelayConnectionHandler);
