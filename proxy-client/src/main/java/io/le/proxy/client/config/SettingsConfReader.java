@@ -1,6 +1,6 @@
 package io.le.proxy.client.config;
 
-import io.le.proxy.server.config.ConfReader;
+import io.le.proxy.config.ConfReader;
 
 import java.io.File;
 import java.io.IOException;

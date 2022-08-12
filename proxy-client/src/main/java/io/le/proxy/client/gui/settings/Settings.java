@@ -4,8 +4,8 @@ import io.le.proxy.client.HttpProxyRelayClient;
 import io.le.proxy.client.gui.TrayGUI;
 import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
 import io.le.proxy.server.relay.config.ReplayRuleConfig;
-import io.le.proxy.server.server.config.ProxyProtocolEnum;
-import io.le.proxy.server.utils.lang.StringUtils;
+import io.le.proxy.server.config.ProxyProtocolEnum;
+import io.le.proxy.utils.lang.StringUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 

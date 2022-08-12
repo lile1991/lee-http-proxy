@@ -1,10 +1,8 @@
 package io.le;
 
-import io.le.proxy.server.relay.HttpProxyRelayServer;
-import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
-import io.le.proxy.server.server.HttpProxyServer;
-import io.le.proxy.server.server.config.*;
-import io.le.proxy.server.utils.net.LocaleInetAddresses;
+import io.le.proxy.server.HttpProxyServer;
+import io.le.proxy.server.config.*;
+import io.le.proxy.utils.net.LocaleInetAddresses;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -81,66 +79,6 @@ public class HttpProxyServerStartup {
             httpProxyServerConfig.setBossGroupThreads(5);
             httpProxyServerConfig.setWorkerGroupThreads(10);
             httpProxyServer.start(httpProxyServerConfig);
-        }
-    }
-
-    private static void demo6789() {
-        {
-            // HTTP代理(解码HTTPS)
-            HttpProxyServer httpProxyServer = new HttpProxyServer();
-            ProxyServerConfig httpProxyServerConfig = new ProxyServerConfig();
-            httpProxyServerConfig.setCodecMsg(true);
-            httpProxyServerConfig.setPort(6666);
-            httpProxyServerConfig.setBossGroupThreads(5);
-            httpProxyServerConfig.setWorkerGroupThreads(10);
-            httpProxyServer.start(httpProxyServerConfig);
-        }
-
-        {
-            // HTTP代理(不解码HTTPS)
-            HttpProxyServer httpProxyServer = new HttpProxyServer();
-            ProxyServerConfig proxyServerConfig = new ProxyServerConfig();
-            proxyServerConfig.setCodecMsg(false);
-            proxyServerConfig.setPort(7777);
-            proxyServerConfig.setBossGroupThreads(5);
-            proxyServerConfig.setWorkerGroupThreads(10);
-            httpProxyServer.start(proxyServerConfig);
-        }
-
-        {
-            // 中继代理
-            HttpProxyRelayServer httpRelayProxyServer = new HttpProxyRelayServer();
-            HttpProxyRelayServerConfig httpProxyRelayServerConfig = new HttpProxyRelayServerConfig();
-            httpProxyRelayServerConfig.setCodecMsg(true);
-            httpProxyRelayServerConfig.setRealProxyHost("127.0.0.1");
-            httpProxyRelayServerConfig.setRealProxyPort(6666);
-            // httpProxyRelayServerConfig.setProxyHost("sprint.ikeatw.com");
-            // httpProxyRelayServerConfig.setProxyPort(50000);
-            // httpProxyRelayServerConfig.setProxyUsername("sprint");
-            // httpProxyRelayServerConfig.setProxyPassword("FtMM7EvG");
-
-            httpProxyRelayServerConfig.setPort(9999);
-            httpProxyRelayServerConfig.setBossGroupThreads(5);
-            httpProxyRelayServerConfig.setWorkerGroupThreads(10);
-            httpRelayProxyServer.start(httpProxyRelayServerConfig);
-        }
-
-        {
-            // 中继代理
-            HttpProxyRelayServer httpRelayProxyServer = new HttpProxyRelayServer();
-            HttpProxyRelayServerConfig httpProxyRelayServerConfig = new HttpProxyRelayServerConfig();
-            httpProxyRelayServerConfig.setCodecMsg(false);
-            httpProxyRelayServerConfig.setRealProxyHost("127.0.0.1");
-            httpProxyRelayServerConfig.setRealProxyPort(7777);
-            // httpProxyRelayServerConfig.setProxyHost("sprint.ikeatw.com");
-            // httpProxyRelayServerConfig.setProxyPort(50000);
-            // httpProxyRelayServerConfig.setProxyUsername("sprint");
-            // httpProxyRelayServerConfig.setProxyPassword("FtMM7EvG");
-
-            httpProxyRelayServerConfig.setPort(8888);
-            httpProxyRelayServerConfig.setBossGroupThreads(5);
-            httpProxyRelayServerConfig.setWorkerGroupThreads(10);
-            httpRelayProxyServer.start(httpProxyRelayServerConfig);
         }
     }
 }
