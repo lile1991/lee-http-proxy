@@ -1,7 +1,8 @@
-package io.le.proxy.server.server.handler.http;
+package io.le.proxy.server.server.handler.http.proxy;
 
 import io.le.proxy.server.server.config.ProxyServerConfig;
 import io.le.proxy.server.server.handler.ProxyExchangeHandler;
+import io.le.proxy.server.server.handler.http.HttpRequestInfo;
 import io.le.proxy.server.server.ssl.BouncyCastleCertificateGenerator;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
@@ -35,7 +36,7 @@ public class HttpConnectToHostHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        log.debug("{} read: {}\r\n{}", ctx.name(), msg, ctx.channel());
+        log.debug("Read: {}\r\n{}", msg, ctx.channel());
         HttpRequest request = (HttpRequest) msg;
 
         ctx.pipeline().remove(ctx.name());
@@ -66,14 +67,14 @@ public class HttpConnectToHostHandler extends ChannelInboundHandlerAdapter {
                             SslContext sslCtxForClient = SslContextBuilder
                                     .forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
                             clientChannel.pipeline().addFirst(sslCtxForClient.newHandler(clientChannel.alloc(), httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort()));
-                            clientChannel.pipeline().addBefore(HttpConnectToHostInitHandler.class.getSimpleName(), null, new HttpClientCodec());
-                            clientChannel.pipeline().addBefore(HttpConnectToHostInitHandler.class.getSimpleName(), null, new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
-                            log.info("Add HttpClientCodec to pipeline");
+                            clientChannel.pipeline().addBefore(ProxyExchangeHandler.class.getSimpleName(), null, new HttpClientCodec());
+                            clientChannel.pipeline().addBefore(ProxyExchangeHandler.class.getSimpleName(), null, new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
+                            log.debug("Add HttpClientCodec to pipeline");
                         } else {
                             // 不解码消息， 移除代理服务器的解码器
                             ctx.pipeline().remove(HttpServerCodec.class);
                             ctx.pipeline().remove(HttpObjectAggregator.class);
-                            log.info("Remove HttpServerCodec from pipeline");
+                            log.debug("Remove HttpServerCodec from pipeline");
                         }
                     });
                 } else {
@@ -93,20 +94,21 @@ public class HttpConnectToHostHandler extends ChannelInboundHandlerAdapter {
         connectTargetServer(ctx, request).addListener((ChannelFutureListener) future -> {
             if(future.isSuccess()) {
                 Channel clientChannel = future.channel();
-                // 连接成功， 移除ConnectionHandler, 添加ExchangeHandler
+
+                // 连接成功
                 log.debug("Successfully connected to {}:{}!\r\n{}", httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort(), clientChannel);
 
-                // 添加Dispatcher
+                clientChannel.pipeline().addBefore(ProxyExchangeHandler.class.getSimpleName(), null, new HttpClientCodec());
+                clientChannel.pipeline().addBefore(ProxyExchangeHandler.class.getSimpleName(), null, new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
+                log.debug("Add HttpClientCodec to pipeline.");
+
+                // 添加Exchange
                 httpProxyExchangeHandler = new ProxyExchangeHandler(serverConfig, clientChannel);
                 ctx.pipeline().addLast(httpProxyExchangeHandler);
+                log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
 
                 // 转发消息给目标服务器
-
-                log.info("Add HttpClientCodec to pipeline");
-                clientChannel.pipeline().addBefore(HttpConnectToHostInitHandler.class.getSimpleName(), null, new HttpClientCodec());
-                clientChannel.pipeline().addBefore(HttpConnectToHostInitHandler.class.getSimpleName(), null, new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
-
-                log.info("WriteAndFlush msg: {}", request.method() + " " + request.uri());
+                log.debug("WriteAndFlush msg: {}", request.method() + " " + request.uri());
                 if(serverConfig.isCodecMsg()) {
                     // 以下两种写法都行
                     // httpProxyExchangeHandler.channelRead(ctx, request);
@@ -115,11 +117,11 @@ public class HttpConnectToHostHandler extends ChannelInboundHandlerAdapter {
                     clientChannel.writeAndFlush(request, clientChannel.newPromise().addListener(future1 -> {
                         ctx.pipeline().remove(HttpServerCodec.class);
                         ctx.pipeline().remove(HttpObjectAggregator.class);
-                        log.info("Remove HttpServerCodec from pipeline");
+                        log.debug("Remove HttpServerCodec from pipeline");
 
                         clientChannel.pipeline().remove(HttpClientCodec.class);
                         clientChannel.pipeline().remove(HttpObjectAggregator.class);
-                        log.info("Remove HttpClientCodec from pipeline");
+                        log.debug("Remove HttpClientCodec from pipeline");
                     }));
                 }
             } else {

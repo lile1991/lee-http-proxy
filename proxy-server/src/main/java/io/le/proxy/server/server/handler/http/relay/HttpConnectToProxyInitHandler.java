@@ -1,7 +1,8 @@
-package io.le.proxy.server.server.handler.http;
+package io.le.proxy.server.server.handler.http.relay;
 
 import io.le.proxy.server.server.config.ProxyServerConfig;
 import io.le.proxy.server.server.handler.ProxyExchangeHandler;
+import io.le.proxy.server.server.handler.http.HttpRequestInfo;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.http.HttpClientCodec;
@@ -32,18 +33,16 @@ public class HttpConnectToProxyInitHandler extends ChannelInitializer<Channel> {
     @Override
     protected void initChannel(Channel ch) throws SSLException {
         // ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
-
-        if(httpRequestInfo.isSsl()) {
-            if(serverConfig.isCodecMsg()) {
-                SslContext sslCtx = SslContextBuilder
-                        .forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
-                ch.pipeline().addFirst(sslCtx.newHandler(ch.alloc(), httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort()));
-            }
-        }
-
         ch.pipeline().addLast(new HttpClientCodec());
         ch.pipeline().addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
-        ch.pipeline().addLast(HttpConnectToProxyInitHandler.class.getSimpleName(), new ProxyExchangeHandler(serverConfig, proxyServerChannel));
-        log.info("Add HttpClientCodec to pipeline");
+        log.debug("Add HttpClientCodec to pipeline");
+
+        if(httpRequestInfo.isSsl()) {
+            // HTTPS连接需要处理一次Connect响应， 需要在ProxyExchangeHandler读取到代理服务器响应后
+            ch.pipeline().addLast(HttpsConnectedToShakeHandsHandler.class.getSimpleName(), new HttpsConnectedToShakeHandsHandler(serverConfig, proxyServerChannel));
+        } else {
+            ch.pipeline().addLast(ProxyExchangeHandler.class.getSimpleName(), new ProxyExchangeHandler(serverConfig, proxyServerChannel));
+        }
+        log.debug("Add ProxyExchangeHandler to pipeline");
     }
 }

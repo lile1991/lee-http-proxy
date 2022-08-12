@@ -56,7 +56,7 @@ public class TrayGUI {
                     System.exit(0);
                 }
             });
-            log.info("Create system tray successfully");
+            log.debug("Create system tray successfully");
         } catch (Exception e) {
             log.error("Create system tray exception", e);
         }
