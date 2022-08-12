@@ -53,7 +53,7 @@ public class HttpRelayDispatcherHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws CertificateException, CertIOException, OperatorCreationException, SSLException {
         // HTTPS请求 && 服务端配置是需要解码
         if(msg instanceof ByteBuf) {
-            if(serverConfig.isCodecSsl()) {
+            if(serverConfig.isCodecMsg()) {
                 // 自签证书
                 X509Certificate x509Certificate = BouncyCastleCertificateGenerator.generateServerCert(httpRequestInfo.getRemoteHost());
                 SslContext sslCtx = SslContextBuilder
@@ -83,7 +83,7 @@ public class HttpRelayDispatcherHandler extends ChannelInboundHandlerAdapter {
 
         // 转发消息给代理服务器
         if(log.isDebugEnabled()) {
-            if(serverConfig.isCodecSsl()) {
+            if(serverConfig.isCodecMsg()) {
                 log.debug("{} RELAY send {} to proxy: \r\n{}", realProxyChannel.toString(), msg.getClass().getSimpleName(), HttpObjectUtils.stringOf(msg));
             } else {
                 log.debug("{} RELAY send {} to proxy: \r\n{}", realProxyChannel.toString(), msg.getClass().getSimpleName(), msg);

@@ -7,6 +7,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +41,7 @@ public class HttpProxyServer {
                     @Override
                     protected void initChannel(Channel ch) throws CertificateException, SSLException {
                         ch.pipeline()
-                            // .addLast(new LoggingHandler())
+                            .addLast(new LoggingHandler())
                                 // Time out process
                             .addLast(new IdleStateHandler(3, 30, 0))
                             .addLast(new ProxyUnificationServerHandler(serverConfig));

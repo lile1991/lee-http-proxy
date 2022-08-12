@@ -2,6 +2,7 @@ package io.le.proxy.server.server.handler.http;
 
 import io.le.proxy.server.server.config.ProxyServerConfig;
 import io.le.proxy.server.server.config.UsernamePasswordAuth;
+import io.le.proxy.server.server.handler.ProxyExchangeHandler;
 import io.le.proxy.server.server.ssl.BouncyCastleCertificateGenerator;
 import io.le.proxy.server.utils.http.HttpObjectUtils;
 import io.netty.bootstrap.Bootstrap;
@@ -30,7 +31,7 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
 
     private HttpRequestInfo httpRequestInfo;
     private final ProxyServerConfig serverConfig;
-    private HttpProxyExchangeHandler httpProxyExchangeHandler;
+    private ProxyExchangeHandler httpProxyExchangeHandler;
     // private final List<Object> messageQueue = new ArrayList<>();
 
     public HttpProxyServerConnectionHandler(ProxyServerConfig serverConfig) {
@@ -92,22 +93,19 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
                     Channel clientChannel = future.channel();
                     // 连接成功， 移除ConnectionHandler, 添加ExchangeHandler
                     log.debug("{} Successfully connected to {}:{}!", clientChannel, httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort());
-                    // 将客户端连接放到channel的AttributeMap中， 所有Handler都可以读到
-                    // if(ctx.pipeline().get(HttpProxyServerConnectionHandler.class) != null) {
 
                     // 添加Dispatcher
-                    httpProxyExchangeHandler = new HttpProxyExchangeHandler(serverConfig, clientChannel);
+                    httpProxyExchangeHandler = new ProxyExchangeHandler(serverConfig, clientChannel);
                     ctx.pipeline().addLast(httpProxyExchangeHandler);
-                    // }
 
                     response200ProxyEstablished(ctx, request).addListener(future1 -> {
-                        if(serverConfig.isCodecSsl()) {
+                        if(serverConfig.isCodecMsg()) {
                             // 自签证书
                             X509Certificate x509Certificate = BouncyCastleCertificateGenerator.generateServerCert(httpRequestInfo.getRemoteHost());
                             SslContext sslCtx = SslContextBuilder
                                     .forServer(BouncyCastleCertificateGenerator.serverPriKey, x509Certificate).build();
-                            ctx.pipeline().addFirst(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
-                            ctx.pipeline().addFirst(new HttpServerCodec());
+                            // ctx.pipeline().addFirst(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
+                            // ctx.pipeline().addFirst(new HttpServerCodec());
                             ctx.pipeline().addFirst(sslCtx.newHandler(ctx.alloc()));
                         } else {
                             ctx.pipeline().remove(HttpServerCodec.class);
@@ -131,13 +129,10 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
                 Channel clientChannel = future.channel();
                 // 连接成功， 移除ConnectionHandler, 添加ExchangeHandler
                 log.debug("{} Successfully connected to {}:{}!", clientChannel, httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort());
-                // 将客户端连接放到channel的AttributeMap中， 所有Handler都可以读到
-                // if(ctx.pipeline().get(HttpProxyServerConnectionHandler.class) != null) {
 
                 // 添加Dispatcher
-                httpProxyExchangeHandler = new HttpProxyExchangeHandler(serverConfig, clientChannel);
+                httpProxyExchangeHandler = new ProxyExchangeHandler(serverConfig, clientChannel);
                 ctx.pipeline().addLast(httpProxyExchangeHandler);
-                // }
 
                 httpProxyExchangeHandler.channelRead(ctx, request);
             } else {

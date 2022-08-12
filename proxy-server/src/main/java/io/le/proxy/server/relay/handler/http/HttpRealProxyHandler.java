@@ -55,7 +55,7 @@ public class HttpRealProxyHandler extends ChannelInboundHandlerAdapter {
         }*/
 
         if(log.isDebugEnabled()) {
-            if(serverConfig.isCodecSsl()) {
+            if(serverConfig.isCodecMsg()) {
                 log.debug("{} Response {} from proxy: \r\n{}", ctx.channel().toString(), msg.getClass().getSimpleName(), HttpObjectUtils.stringOf(msg));
             } else {
                 log.debug("{} Response {} from proxy: \r\n{}", ctx.channel().toString(), msg.getClass().getSimpleName(), msg);
@@ -74,7 +74,7 @@ public class HttpRealProxyHandler extends ChannelInboundHandlerAdapter {
                         relayChannel.pipeline().remove(HttpObjectAggregator.class);
                         log.debug("Remove HttpServerCodec from relayChannel: {}", relayChannel.pipeline().names());
 
-                        if (!serverConfig.isCodecSsl()) {
+                        if (!serverConfig.isCodecMsg()) {
                             // 不解码HTTPS， HttpClientCodec 也就无效了, 可以移除掉
                             ctx.channel().pipeline().remove(HttpObjectAggregator.class);
                             ctx.channel().pipeline().remove(HttpClientCodec.class);

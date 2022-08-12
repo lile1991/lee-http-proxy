@@ -15,8 +15,8 @@ public class ProxyServerConfig {
     /** 绑定的端口 */
     protected int port;
 
-    /** 是否解码HTTPS数据 */
-    protected boolean codecSsl = false;
+    /** 是否解码数据包 */
+    protected boolean codecMsg = false;
 
     /** HTTP合包的最大大小 15MB */
     protected int httpObjectAggregatorMaxContentLength = 15 * 1024 * 128;

@@ -1,4 +1,4 @@
-package io.le.proxy.server.server.handler.http;
+package io.le.proxy.server.server.handler;
 
 import io.le.proxy.server.server.config.ProxyServerConfig;
 import io.netty.channel.Channel;
@@ -11,11 +11,11 @@ import lombok.extern.slf4j.Slf4j;
  * Http代理交换机
  */
 @Slf4j
-public class HttpProxyExchangeHandler extends ChannelInboundHandlerAdapter {
+public class ProxyExchangeHandler extends ChannelInboundHandlerAdapter {
     private final ProxyServerConfig serverConfig;
     private final Channel exchangeChannel;
 
-    public HttpProxyExchangeHandler(ProxyServerConfig serverConfig, Channel exchangeChannel) {
+    public ProxyExchangeHandler(ProxyServerConfig serverConfig, Channel exchangeChannel) {
         this.serverConfig = serverConfig;
         this.exchangeChannel = exchangeChannel;
     }

@@ -27,7 +27,7 @@ public class Settings {
     public Settings(HttpProxyRelayClient httpProxyRelayClient) {
         this.httpProxyRelayClient = httpProxyRelayClient;
         httpProxyRelayServerConfig = new HttpProxyRelayServerConfig();
-        httpProxyRelayServerConfig.setCodecSsl(false);
+        httpProxyRelayServerConfig.setCodecMsg(false);
         // httpProxyRelayServerConfig.setProxyProtocols(HttpProxyServerConfig.ProxyProtocol.HTTP);
         // httpProxyRelayServerConfig.setRelayProtocols(HttpProxyServerConfig.ProxyProtocol.LEE);
 
@@ -139,7 +139,7 @@ public class Settings {
                 SettingsForm.Form form = settingsForm.get();
 
                 HttpProxyRelayServerConfig httpProxyRelayServerConfig = httpProxyRelayClient.getHttpProxyRelayServerConfig();
-                httpProxyRelayServerConfig.setCodecSsl(false);
+                httpProxyRelayServerConfig.setCodecMsg(false);
                 httpProxyRelayServerConfig.setProxyProtocols(Collections.singletonList(ProxyProtocolEnum.HTTP));
                 httpProxyRelayServerConfig.setRelayProtocols(Arrays.asList(ProxyProtocolEnum.HTTP, ProxyProtocolEnum.LEE));
 

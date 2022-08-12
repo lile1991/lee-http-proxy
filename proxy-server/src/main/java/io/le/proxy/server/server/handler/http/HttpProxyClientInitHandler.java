@@ -1,6 +1,7 @@
 package io.le.proxy.server.server.handler.http;
 
 import io.le.proxy.server.server.config.ProxyServerConfig;
+import io.le.proxy.server.server.handler.ProxyExchangeHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.http.HttpClientCodec;
@@ -28,7 +29,7 @@ public class HttpProxyClientInitHandler extends ChannelInitializer<Channel> {
     protected void initChannel(Channel ch) throws Exception {
         // ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
         if(httpRequestInfo.isSsl()) {
-            if(serverConfig.isCodecSsl()) {
+            if(serverConfig.isCodecMsg()) {
                 SslContext sslCtx = SslContextBuilder
                         .forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
                 ch.pipeline().addFirst(sslCtx.newHandler(ch.alloc(), httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort()));
@@ -41,6 +42,6 @@ public class HttpProxyClientInitHandler extends ChannelInitializer<Channel> {
             ch.pipeline().addLast(new HttpClientCodec());
             ch.pipeline().addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
         }
-        ch.pipeline().addLast(new HttpProxyExchangeHandler(serverConfig, proxyServerChannel));
+        ch.pipeline().addLast(new ProxyExchangeHandler(serverConfig, proxyServerChannel));
     }
 }

@@ -23,7 +23,7 @@ public class HttpProxyServerStartup {
                     ProxyProtocolEnum.HTTPS,
                     ProxyProtocolEnum.SOCKS4a,
                     ProxyProtocolEnum.SOCKS5));
-            httpProxyServerConfig.setCodecSsl(false);
+            httpProxyServerConfig.setCodecMsg(true);
             httpProxyServerConfig.setPort(40000);
             httpProxyServerConfig.setUsernamePasswordAuth(new UsernamePasswordAuth("auh", "123123"));
             httpProxyServerConfig.setBossGroupThreads(5);
@@ -40,7 +40,7 @@ public class HttpProxyServerStartup {
                     ProxyProtocolEnum.HTTPS,
                     ProxyProtocolEnum.SOCKS4a,
                     ProxyProtocolEnum.SOCKS5));
-            httpProxyServerConfig.setCodecSsl(false);
+            httpProxyServerConfig.setCodecMsg(false);
             httpProxyServerConfig.setPort(40001);
             httpProxyServerConfig.setUsernamePasswordAuth(new UsernamePasswordAuth("auh", "456789"));
             httpProxyServerConfig.setBossGroupThreads(5);
@@ -65,7 +65,7 @@ public class HttpProxyServerStartup {
                 HttpProxyServer httpProxyServer = new HttpProxyServer();
                 ProxyServerConfig httpProxyServerConfig = new ProxyServerConfig();
                 httpProxyServerConfig.setProxyProtocols(Arrays.asList(ProxyProtocolEnum.HTTP, ProxyProtocolEnum.HTTPS, ProxyProtocolEnum.LEE));
-                httpProxyServerConfig.setCodecSsl(false);
+                httpProxyServerConfig.setCodecMsg(false);
                 httpProxyServerConfig.setPort(40002 + i);
                 httpProxyServerConfig.setBossGroupThreads(5);
                 httpProxyServerConfig.setWorkerGroupThreads(10);
@@ -76,7 +76,7 @@ public class HttpProxyServerStartup {
             HttpProxyServer httpProxyServer = new HttpProxyServer();
             ProxyServerConfig httpProxyServerConfig = new ProxyServerConfig();
             httpProxyServerConfig.setProxyProtocols(Arrays.asList(ProxyProtocolEnum.HTTP, ProxyProtocolEnum.HTTPS));
-            httpProxyServerConfig.setCodecSsl(false);
+            httpProxyServerConfig.setCodecMsg(false);
             httpProxyServerConfig.setPort(40002);
             httpProxyServerConfig.setBossGroupThreads(5);
             httpProxyServerConfig.setWorkerGroupThreads(10);
@@ -89,7 +89,7 @@ public class HttpProxyServerStartup {
             // HTTP代理(解码HTTPS)
             HttpProxyServer httpProxyServer = new HttpProxyServer();
             ProxyServerConfig httpProxyServerConfig = new ProxyServerConfig();
-            httpProxyServerConfig.setCodecSsl(true);
+            httpProxyServerConfig.setCodecMsg(true);
             httpProxyServerConfig.setPort(6666);
             httpProxyServerConfig.setBossGroupThreads(5);
             httpProxyServerConfig.setWorkerGroupThreads(10);
@@ -100,7 +100,7 @@ public class HttpProxyServerStartup {
             // HTTP代理(不解码HTTPS)
             HttpProxyServer httpProxyServer = new HttpProxyServer();
             ProxyServerConfig proxyServerConfig = new ProxyServerConfig();
-            proxyServerConfig.setCodecSsl(false);
+            proxyServerConfig.setCodecMsg(false);
             proxyServerConfig.setPort(7777);
             proxyServerConfig.setBossGroupThreads(5);
             proxyServerConfig.setWorkerGroupThreads(10);
@@ -111,7 +111,7 @@ public class HttpProxyServerStartup {
             // 中继代理
             HttpProxyRelayServer httpRelayProxyServer = new HttpProxyRelayServer();
             HttpProxyRelayServerConfig httpProxyRelayServerConfig = new HttpProxyRelayServerConfig();
-            httpProxyRelayServerConfig.setCodecSsl(true);
+            httpProxyRelayServerConfig.setCodecMsg(true);
             httpProxyRelayServerConfig.setRealProxyHost("127.0.0.1");
             httpProxyRelayServerConfig.setRealProxyPort(6666);
             // httpProxyRelayServerConfig.setProxyHost("sprint.ikeatw.com");
@@ -129,7 +129,7 @@ public class HttpProxyServerStartup {
             // 中继代理
             HttpProxyRelayServer httpRelayProxyServer = new HttpProxyRelayServer();
             HttpProxyRelayServerConfig httpProxyRelayServerConfig = new HttpProxyRelayServerConfig();
-            httpProxyRelayServerConfig.setCodecSsl(false);
+            httpProxyRelayServerConfig.setCodecMsg(false);
             httpProxyRelayServerConfig.setRealProxyHost("127.0.0.1");
             httpProxyRelayServerConfig.setRealProxyPort(7777);
             // httpProxyRelayServerConfig.setProxyHost("sprint.ikeatw.com");
