@@ -41,7 +41,7 @@ public class HttpProxyServer {
                     @Override
                     protected void initChannel(Channel ch) throws CertificateException, SSLException {
                         ch.pipeline()
-                            .addLast(new LoggingHandler())
+                            // .addLast(new LoggingHandler())
                                 // Time out process
                             .addLast(new IdleStateHandler(3, 30, 0))
                             .addLast(new ProxyUnificationServerHandler(serverConfig));

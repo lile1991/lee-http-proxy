@@ -23,7 +23,7 @@ public class HttpProxyServerStartup {
                     ProxyProtocolEnum.HTTPS,
                     ProxyProtocolEnum.SOCKS4a,
                     ProxyProtocolEnum.SOCKS5));
-            httpProxyServerConfig.setCodecMsg(true);
+            httpProxyServerConfig.setCodecMsg(false);
             httpProxyServerConfig.setPort(40000);
             httpProxyServerConfig.setUsernamePasswordAuth(new UsernamePasswordAuth("auh", "123123"));
             httpProxyServerConfig.setBossGroupThreads(5);

@@ -130,7 +130,17 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
                 httpProxyExchangeHandler = new ProxyExchangeHandler(serverConfig, clientChannel);
                 ctx.pipeline().addLast(httpProxyExchangeHandler);
 
-                httpProxyExchangeHandler.channelRead(ctx, request);
+                // 转发消息给目标服务器
+                if(serverConfig.isCodecMsg()) {
+                    // 以下两种写法都行
+                    // httpProxyExchangeHandler.channelRead(ctx, request);
+                    clientChannel.writeAndFlush(request);
+                } else {
+                    clientChannel.writeAndFlush(request, clientChannel.newPromise().addListener(future1 -> {
+                        ctx.pipeline().remove(HttpServerCodec.class);
+                        ctx.pipeline().remove(HttpObjectAggregator.class);
+                    }));
+                }
             } else {
                 log.error("Failed connect to {}:{}", httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort());
                 if (ctx.channel().isActive()) {
