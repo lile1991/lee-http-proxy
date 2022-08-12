@@ -62,7 +62,7 @@ public class HttpConnectToProxyHandler extends ChannelInboundHandlerAdapter {
                     clientChannel.writeAndFlush(request);
                     log.debug("Write CONNECT request: {}\r\n{}", request, clientChannel);
                 } else {
-                    log.error("Failed connect to {}:{}", httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort());
+                    log.error("Failed connect to {}:{}\r\b{}", httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort(), ctx);
                     if (ctx.channel().isActive()) {
                         ctx.channel().writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
                     } else {
