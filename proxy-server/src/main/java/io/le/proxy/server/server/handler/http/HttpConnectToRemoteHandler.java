@@ -16,14 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 import java.security.cert.X509Certificate;
 
 /**
- * 连接到远端服务器
+ * HTTP代理
  */
 @Slf4j
 public class HttpConnectToRemoteHandler extends ChannelInboundHandlerAdapter {
 
-    private HttpRequestInfo httpRequestInfo;
-    private final ProxyServerConfig serverConfig;
-    private ProxyExchangeHandler httpProxyExchangeHandler;
+    HttpRequestInfo httpRequestInfo;
+    final ProxyServerConfig serverConfig;
+    ProxyExchangeHandler httpProxyExchangeHandler;
     // private final List<Object> messageQueue = new ArrayList<>();
 
     public HttpConnectToRemoteHandler(ProxyServerConfig serverConfig) {
