@@ -39,20 +39,20 @@ public class Socks5ProxyServerConnectionHandler extends SimpleChannelInboundHand
                 if(future1.isSuccess()) {
                     log.debug("Successfully connected to {}:{}! \r\n{}", msg.dstAddr(), msg.dstPort(), clientChannel);
                     ctx.pipeline().addLast(new ProxyExchangeHandler(serverConfig, clientChannel));
-                    Socks5CommandResponse commandResponse = new DefaultSocks5CommandResponse(Socks5CommandStatus.SUCCESS, Socks5AddressType.IPv4);
-                    ctx.writeAndFlush(commandResponse);
+                    ctx.writeAndFlush(new DefaultSocks5CommandResponse(Socks5CommandStatus.SUCCESS, Socks5AddressType.IPv4));
 
                     ctx.pipeline().remove(Socks5ServerEncoder.class);
                 } else {
-                    Socks5CommandResponse commandResponse = new DefaultSocks5CommandResponse(Socks5CommandStatus.FAILURE, Socks5AddressType.IPv4);
-                    ctx.writeAndFlush(commandResponse);
+                    log.error("Connected failed {}:{}", msg.dstAddr(), msg.dstPort());
+                    ctx.writeAndFlush(new DefaultSocks5CommandResponse(Socks5CommandStatus.FAILURE, Socks5AddressType.IPv4));
                 }
             });
 
             ctx.pipeline().remove(ctx.name());
-        } else {
+        }/* else {
+            // never execute
             log.warn("Socks5 channelRead0 {}", msg);
             ctx.fireChannelRead(msg);
-        }
+        }*/
     }
 }

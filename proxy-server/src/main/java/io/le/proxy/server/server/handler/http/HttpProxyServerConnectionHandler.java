@@ -142,7 +142,7 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
                     }));
                 }
             } else {
-                log.error("Failed connect to {}:{}", httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort());
+                log.error("Connected failed {}:{}", httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort());
                 if (ctx.channel().isActive()) {
                     ctx.channel().writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
                 } else {
