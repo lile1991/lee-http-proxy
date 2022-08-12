@@ -4,7 +4,7 @@ import io.le.proxy.server.config.ProxyProtocolEnum;
 import io.le.proxy.server.config.ProxyServerConfig;
 import io.le.proxy.server.handler.http.HttpAcceptConnectHandler;
 import io.le.proxy.server.handler.http.proxy.HttpConnectToHostHandler;
-import io.le.proxy.server.handler.http.relay.HttpConnectToProxyHandler;
+import io.le.proxy.server.handler.http.relay.http.HttpConnectToHttpProxyHandler;
 import io.le.proxy.server.handler.https.SslHandlerCreator;
 import io.le.proxy.server.handler.socks5.Socks5InitialRequestHandler;
 import io.netty.buffer.ByteBuf;
@@ -130,7 +130,7 @@ public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter 
         if(serverConfig.getRelayServerConfig() == null) {
             ctx.pipeline().addLast(new HttpConnectToHostHandler(serverConfig));
         } else {
-            ctx.pipeline().addLast(new HttpConnectToProxyHandler(serverConfig));
+            ctx.pipeline().addLast(new HttpConnectToHttpProxyHandler(serverConfig));
         }
     }
     public void addHttpsHandlers(ChannelHandlerContext ctx) throws SSLException, CertificateException {

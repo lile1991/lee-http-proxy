@@ -1,4 +1,4 @@
-package io.le.proxy.server.handler.http.relay;
+package io.le.proxy.server.handler.http.relay.http;
 
 import io.le.proxy.server.config.ProxyServerConfig;
 import io.le.proxy.server.handler.ProxyExchangeHandler;
@@ -12,11 +12,11 @@ import lombok.extern.slf4j.Slf4j;
  * 与真实Proxy Server握手处理器
  */
 @Slf4j
-public class HttpsConnectedToShakeHandsHandler extends ChannelInboundHandlerAdapter {
+public class HttpsConnectRelayShakeHandsHandler extends ChannelInboundHandlerAdapter {
     private final ProxyServerConfig serverConfig;
     private final Channel proxyServerChannel;
 
-    public HttpsConnectedToShakeHandsHandler(ProxyServerConfig serverConfig, Channel proxyServerChannel) {
+    public HttpsConnectRelayShakeHandsHandler(ProxyServerConfig serverConfig, Channel proxyServerChannel) {
         this.serverConfig = serverConfig;
         this.proxyServerChannel = proxyServerChannel;
     }

@@ -1,18 +1,15 @@
-package io.le.proxy.server.handler.http.relay;
+package io.le.proxy.server.handler.http.relay.http;
 
-import io.le.proxy.server.config.NetAddress;
-import io.le.proxy.server.config.ProxyServerConfig;
-import io.le.proxy.server.config.RelayServerConfig;
-import io.le.proxy.server.config.UsernamePasswordAuth;
+import io.le.proxy.server.config.*;
 import io.le.proxy.server.handler.ProxyExchangeHandler;
 import io.le.proxy.server.handler.http.HttpRequestInfo;
+import io.le.proxy.server.handler.http.relay.https.HttpConnectToHttpsProxyInitHandler;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
@@ -22,12 +19,12 @@ import java.util.Base64;
  * Relay中继， 连接到另一个HTTP代理
  */
 @Slf4j
-public class HttpConnectToProxyHandler extends ChannelInboundHandlerAdapter {
+public class HttpConnectToHttpProxyHandler extends ChannelInboundHandlerAdapter {
 
     HttpRequestInfo httpRequestInfo;
     final ProxyServerConfig serverConfig;
 
-    public HttpConnectToProxyHandler(ProxyServerConfig serverConfig) {
+    public HttpConnectToHttpProxyHandler(ProxyServerConfig serverConfig) {
         this.serverConfig = serverConfig;
     }
 
@@ -103,6 +100,9 @@ public class HttpConnectToProxyHandler extends ChannelInboundHandlerAdapter {
 
     private ChannelFuture connectTargetProxy(ChannelHandlerContext ctx, HttpRequest request) {
         httpRequestInfo = new HttpRequestInfo(request);
+        RelayServerConfig relayServerConfig = serverConfig.getRelayServerConfig();
+        ProxyProtocolEnum relayProtocol = relayServerConfig.getRelayProtocol();
+
 
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(ctx.channel().eventLoop())
@@ -113,15 +113,23 @@ public class HttpConnectToProxyHandler extends ChannelInboundHandlerAdapter {
                 // .localAddress(serverIp, randomSystemPort)
                 // Bind local ip and port
                 // .remoteAddress(serverIp, randomSystemPort)
-                .handler(new HttpConnectToProxyInitHandler(ctx.channel(), serverConfig, httpRequestInfo))
                 ;
+        switch (relayProtocol) {
+            case HTTP: bootstrap.handler(new HttpConnectToHttpProxyInitHandler(ctx.channel(), serverConfig, httpRequestInfo)); break;
+            case HTTPS: bootstrap.handler(new HttpConnectToHttpsProxyInitHandler(ctx.channel(), serverConfig, httpRequestInfo)); break;
+            default:
+                ByteBuf responseBody = ctx.alloc().buffer();
+                responseBody.writeCharSequence("Unsupported relay protocol " + relayProtocol, StandardCharsets.UTF_8);
+                DefaultFullHttpResponse defaultFullHttpResponse = new DefaultFullHttpResponse(request.protocolVersion(), HttpResponseStatus.NOT_IMPLEMENTED, responseBody);
+                return ctx.writeAndFlush(defaultFullHttpResponse).addListener(ChannelFutureListener.CLOSE);
+        }
 
         if(serverConfig.getLocalAddress() != null) {
             // Bind local net address
             bootstrap.remoteAddress(serverConfig.getLocalAddress());
         }
 
-        RelayServerConfig relayServerConfig = serverConfig.getRelayServerConfig();
+
         NetAddress relayNetAddress = relayServerConfig.getRelayNetAddress();
         return bootstrap.connect(relayNetAddress.getRemoteHost(), relayNetAddress.getRemotePort());
     }

@@ -1,4 +1,4 @@
-package io.le.proxy.server.handler.http.relay;
+package io.le.proxy.server.handler.http.relay.http;
 
 import io.le.proxy.server.config.ProxyServerConfig;
 import io.le.proxy.server.handler.ProxyExchangeHandler;
@@ -15,13 +15,13 @@ import javax.net.ssl.SSLException;
  * 与目标网站的Handler
  */
 @Slf4j
-public class HttpConnectToProxyInitHandler extends ChannelInitializer<Channel> {
+public class HttpConnectToHttpProxyInitHandler extends ChannelInitializer<Channel> {
     private final Channel proxyServerChannel;
     private final ProxyServerConfig serverConfig;
     private final HttpRequestInfo httpRequestInfo;
 
 
-    public HttpConnectToProxyInitHandler(Channel proxyServerChannel, ProxyServerConfig serverConfig, HttpRequestInfo httpRequestInfo) {
+    public HttpConnectToHttpProxyInitHandler(Channel proxyServerChannel, ProxyServerConfig serverConfig, HttpRequestInfo httpRequestInfo) {
         this.proxyServerChannel = proxyServerChannel;
         this.serverConfig = serverConfig;
         this.httpRequestInfo = httpRequestInfo;
@@ -36,7 +36,7 @@ public class HttpConnectToProxyInitHandler extends ChannelInitializer<Channel> {
 
         if(httpRequestInfo.isSsl()) {
             // HTTPS连接需要处理一次Connect响应， 需要在ProxyExchangeHandler读取到代理服务器响应后
-            ch.pipeline().addLast(HttpsConnectedToShakeHandsHandler.class.getSimpleName(), new HttpsConnectedToShakeHandsHandler(serverConfig, proxyServerChannel));
+            ch.pipeline().addLast(HttpsConnectRelayShakeHandsHandler.class.getSimpleName(), new HttpsConnectRelayShakeHandsHandler(serverConfig, proxyServerChannel));
         } else {
             ch.pipeline().addLast(ProxyExchangeHandler.class.getSimpleName(), new ProxyExchangeHandler(serverConfig, proxyServerChannel));
         }
