@@ -5,10 +5,7 @@ import io.le.proxy.server.server.handler.ProxyExchangeHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpResponse;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.*;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -38,10 +35,12 @@ public class HttpsConnectedToShakeHandsHandler extends ChannelInboundHandlerAdap
                 // 中继都不解码消息， 移除代理服务器的解码器
                 proxyServerChannel.pipeline().remove(HttpServerCodec.class);
                 proxyServerChannel.pipeline().remove(HttpObjectAggregator.class);
+                proxyServerChannel.pipeline().addLast(new ProxyExchangeHandler(serverConfig, ctx.channel()));
                 log.debug("Remove HttpServerCodec from pipeline");
 
-                proxyServerChannel.pipeline().addLast(new ProxyExchangeHandler(serverConfig, proxyServerChannel));
                 ctx.pipeline().remove(ctx.name());
+                ctx.pipeline().remove(HttpClientCodec.class);
+                ctx.pipeline().remove(HttpObjectAggregator.class);
                 ctx.pipeline().addLast(new ProxyExchangeHandler(serverConfig, proxyServerChannel));
                 log.debug("Add ProxyExchangeHandler to ProxyServerPipeline and RelayServerPipeline.");
             }));
