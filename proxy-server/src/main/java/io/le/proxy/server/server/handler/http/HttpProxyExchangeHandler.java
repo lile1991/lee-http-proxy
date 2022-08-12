@@ -1,10 +1,10 @@
 package io.le.proxy.server.server.handler.http;
 
 import io.le.proxy.server.server.config.ProxyServerConfig;
-import io.le.proxy.server.utils.http.HttpObjectUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.HttpObject;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -28,8 +28,8 @@ public class HttpProxyExchangeHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if(log.isDebugEnabled()) {
-            if(serverConfig.isCodecSsl()) {
-                log.debug("{} read {} from remote: \r\n{}", exchangeChannel.toString(), msg.getClass().getSimpleName(), HttpObjectUtils.stringOf(msg));
+            if(msg instanceof HttpObject) {
+                log.debug("{} read {} from remote: \r\n{}", exchangeChannel.toString(), msg.getClass().getSimpleName(), ((HttpObject) msg).decoderResult());
             } else {
                 log.debug("{} read {} from remote: \r\n{}", exchangeChannel.toString(), msg.getClass().getSimpleName(), msg);
             }
