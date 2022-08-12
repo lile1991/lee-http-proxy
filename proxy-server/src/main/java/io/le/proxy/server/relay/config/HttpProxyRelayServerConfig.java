@@ -1,7 +1,7 @@
 package io.le.proxy.server.relay.config;
 
-import io.le.proxy.server.server.config.ProxyServerConfig;
 import io.le.proxy.server.server.config.ProxyProtocolEnum;
+import io.le.proxy.server.server.config.ProxyServerConfig;
 import lombok.Getter;
 import lombok.Setter;
 

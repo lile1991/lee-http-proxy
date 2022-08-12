@@ -13,12 +13,8 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.cert.CertIOException;
-import org.bouncycastle.operator.OperatorCreationException;
 
-import javax.net.ssl.SSLException;
 import java.nio.charset.StandardCharsets;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 
@@ -64,7 +60,7 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
         }
     }
 
-    private ChannelFuture channelReadHttpRequest(ChannelHandlerContext ctx, HttpRequest request) throws CertificateException, OperatorCreationException, CertIOException, SSLException {
+    private ChannelFuture channelReadHttpRequest(ChannelHandlerContext ctx, HttpRequest request) {
         String proxyAuthorization = request.headers().get("Proxy-Authorization");
         if(serverConfig.getUsernamePasswordAuth() != null) {
             if(proxyAuthorization == null || proxyAuthorization.isEmpty()) {
@@ -146,7 +142,7 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
         });
     }
 
-    private ChannelFuture connectTargetServer(ChannelHandlerContext ctx, HttpRequest request) throws CertificateException, OperatorCreationException, CertIOException, SSLException {
+    private ChannelFuture connectTargetServer(ChannelHandlerContext ctx, HttpRequest request) {
         httpRequestInfo = new HttpRequestInfo(request);
 
         Bootstrap bootstrap = new Bootstrap();
