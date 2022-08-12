@@ -3,7 +3,8 @@ package io.le.proxy.server.server.handler;
 import io.le.proxy.server.server.config.ProxyProtocolEnum;
 import io.le.proxy.server.server.config.ProxyServerConfig;
 import io.le.proxy.server.server.handler.http.HttpAcceptConnectHandler;
-import io.le.proxy.server.server.handler.http.HttpConnectToRemoteHandler;
+import io.le.proxy.server.server.handler.http.HttpConnectToHostHandler;
+import io.le.proxy.server.server.handler.http.HttpConnectToProxyHandler;
 import io.le.proxy.server.server.handler.https.SslHandlerCreator;
 import io.le.proxy.server.server.handler.socks5.Socks5InitialRequestHandler;
 import io.netty.buffer.ByteBuf;
@@ -40,7 +41,7 @@ public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter 
             return;
         }
 
-        logKnownVersion(ctx, protocol);
+        logKnownProtocol(ctx, protocol);
 
         if(!serverConfig.getProxyProtocols().contains(protocol)) {
             log.warn("The proxy server does not support the {} protocol!", protocol);
@@ -94,8 +95,8 @@ public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter 
         // ch.pipeline().addLast(new Socks5CommandRequestHandler(ProxyServer.this.getBossGroup()));
     }
 
-    private static void logKnownVersion(ChannelHandlerContext ctx, ProxyProtocolEnum version) {
-        log.debug("{} Protocol version: {}", ctx.channel(), version);
+    private static void logKnownProtocol(ChannelHandlerContext ctx, ProxyProtocolEnum protocol) {
+        log.debug("{} Protocol version: {}", ctx.channel(), protocol);
     }
 
     private ProxyProtocolEnum parseProxyProtocol(ByteBuf msg) {
@@ -124,8 +125,13 @@ public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter 
         ctx.pipeline()
                 .addLast(new HttpServerCodec())
                 .addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()))
-                .addLast(new HttpAcceptConnectHandler(serverConfig))
-                .addLast(new HttpConnectToRemoteHandler(serverConfig));
+                .addLast(new HttpAcceptConnectHandler(serverConfig));
+
+        if(serverConfig.getRelayServerConfig() == null) {
+            ctx.pipeline().addLast(new HttpConnectToHostHandler(serverConfig));
+        } else {
+            ctx.pipeline().addLast(new HttpConnectToProxyHandler(serverConfig));
+        }
     }
     public void addHttpsHandlers(ChannelHandlerContext ctx) throws SSLException, CertificateException {
         Channel ch = ctx.channel();

@@ -8,10 +8,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.*;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
@@ -99,7 +96,7 @@ public class HttpRelayDispatcherHandler extends ChannelInboundHandlerAdapter {
             HttpRequest request = (HttpRequest) msg;
             if (request.method() == HttpMethod.CONNECT || request.uri().startsWith("http://")) {
                 String proxyAuthorization = serverConfig.getProxyUsername() + ":" + serverConfig.getProxyPassword();
-                request.headers().set("Proxy-Authorization", "Basic " + Base64.getEncoder().encodeToString(proxyAuthorization.getBytes(StandardCharsets.UTF_8)));
+                request.headers().set(HttpHeaderNames.PROXY_AUTHORIZATION.toString(), "Basic " + Base64.getEncoder().encodeToString(proxyAuthorization.getBytes(StandardCharsets.UTF_8)));
                 // request.headers().set("Proxy-Connection", "Keep-Alive");
             }
         }

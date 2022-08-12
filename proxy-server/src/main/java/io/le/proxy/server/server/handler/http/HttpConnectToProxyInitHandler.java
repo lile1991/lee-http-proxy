@@ -9,41 +9,41 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.net.ssl.SSLException;
 
 /**
  * 与目标网站的Handler
  */
-public class HttpConnectToRemoteInitHandler extends ChannelInitializer<Channel> {
+@Slf4j
+public class HttpConnectToProxyInitHandler extends ChannelInitializer<Channel> {
     private final Channel proxyServerChannel;
     private final ProxyServerConfig serverConfig;
     private final HttpRequestInfo httpRequestInfo;
 
 
-    public HttpConnectToRemoteInitHandler(Channel proxyServerChannel, ProxyServerConfig serverConfig, HttpRequestInfo httpRequestInfo) {
+    public HttpConnectToProxyInitHandler(Channel proxyServerChannel, ProxyServerConfig serverConfig, HttpRequestInfo httpRequestInfo) {
         this.proxyServerChannel = proxyServerChannel;
         this.serverConfig = serverConfig;
         this.httpRequestInfo = httpRequestInfo;
     }
 
     @Override
-    protected void initChannel(Channel ch) {
+    protected void initChannel(Channel ch) throws SSLException {
         // ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
 
-        // 解码器放到HttpConnectToRemoteHandler去添加
-        /*if(httpRequestInfo.isSsl()) {
+        if(httpRequestInfo.isSsl()) {
             if(serverConfig.isCodecMsg()) {
                 SslContext sslCtx = SslContextBuilder
                         .forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
                 ch.pipeline().addFirst(sslCtx.newHandler(ch.alloc(), httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort()));
-                // ch.pipeline().addLast(new HttpContentDecompressor());
-                ch.pipeline().addLast(new HttpClientCodec());
-                ch.pipeline().addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
             }
-        } else {
-            // ch.pipeline().addLast(new HttpContentDecompressor());
-            ch.pipeline().addLast(new HttpClientCodec());
-            ch.pipeline().addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
-        }*/
-        ch.pipeline().addLast(HttpConnectToRemoteInitHandler.class.getSimpleName(), new ProxyExchangeHandler(serverConfig, proxyServerChannel));
+        }
+
+        ch.pipeline().addLast(new HttpClientCodec());
+        ch.pipeline().addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
+        ch.pipeline().addLast(HttpConnectToProxyInitHandler.class.getSimpleName(), new ProxyExchangeHandler(serverConfig, proxyServerChannel));
+        log.info("Add HttpClientCodec to pipeline");
     }
 }

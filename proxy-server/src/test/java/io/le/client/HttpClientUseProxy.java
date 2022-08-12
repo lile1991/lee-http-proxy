@@ -41,7 +41,7 @@ public class HttpClientUseProxy {
         // ChannelFuture clientChannelFuture = bootstrap.connect("www.baidu.com", 443);
         clientChannelFuture.addListener((ChannelFutureListener) future -> {
             DefaultFullHttpRequest connectRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.CONNECT, "https://www.google.com");
-            connectRequest.headers().set("Proxy-Authorization", "Basic " + Base64.getEncoder().encodeToString("sprint:FtMM7EvG".getBytes(StandardCharsets.UTF_8)));
+            connectRequest.headers().set(HttpHeaderNames.PROXY_AUTHORIZATION.toString(), "Basic " + Base64.getEncoder().encodeToString("sprint:FtMM7EvG".getBytes(StandardCharsets.UTF_8)));
             connectRequest.headers().set("Host", "www.google.com");
             connectRequest.headers().set("Proxy-Connection", "keep-alive");
             connectRequest.headers().set(HttpHeaderNames.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");

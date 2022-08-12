@@ -10,6 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NetAddress {
-    private String ip;
-    private Integer port;
+    private String remoteHost;
+    private Integer remotePort;
 }

@@ -46,7 +46,7 @@ public class HttpAcceptConnectHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         log.debug("{} read: {}\r\n{}", ctx.name(), msg, ctx.channel());
         HttpRequest request = (HttpRequest) msg;
-        String proxyAuthorization = request.headers().get("Proxy-Authorization");
+        String proxyAuthorization = request.headers().get(HttpHeaderNames.PROXY_AUTHORIZATION.toString());
         if(serverConfig.getUsernamePasswordAuth() != null) {
             if(proxyAuthorization == null || proxyAuthorization.isEmpty()) {
                 log.debug("Please provide Proxy-Authorization\r\n{}", ctx);
