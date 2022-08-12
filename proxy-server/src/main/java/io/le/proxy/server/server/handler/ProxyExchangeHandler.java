@@ -29,9 +29,9 @@ public class ProxyExchangeHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if(log.isDebugEnabled()) {
             if(msg instanceof HttpObject) {
-                log.debug("{} read {} from remote: \r\n{}", exchangeChannel.toString(), msg.getClass().getSimpleName(), msg);
+                log.debug("Read {} from remote: \r\n{}\r\n{}", msg.getClass().getSimpleName(), msg, exchangeChannel.toString());
             } else {
-                log.debug("{} read {} from remote: \r\n{}", exchangeChannel.toString(), msg.getClass().getSimpleName(), msg);
+                log.debug("Read {} from remote: \r\n{}\r\n{}", msg.getClass().getSimpleName(), msg, exchangeChannel.toString());
             }
         }
         exchangeChannel.writeAndFlush(msg);

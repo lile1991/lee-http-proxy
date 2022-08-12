@@ -37,7 +37,7 @@ public class Socks5ProxyServerConnectionHandler extends SimpleChannelInboundHand
             future.addListener((ChannelFutureListener) future1 -> {
                 Channel clientChannel = future1.channel();
                 if(future1.isSuccess()) {
-                    log.debug("{} Successfully connected to {}:{}!", clientChannel, msg.dstAddr(), msg.dstPort());
+                    log.debug("Successfully connected to {}:{}! \r\n{}", msg.dstAddr(), msg.dstPort(), clientChannel);
                     ctx.pipeline().addLast(new ProxyExchangeHandler(serverConfig, clientChannel));
                     Socks5CommandResponse commandResponse = new DefaultSocks5CommandResponse(Socks5CommandStatus.SUCCESS, Socks5AddressType.IPv4);
                     ctx.writeAndFlush(commandResponse);

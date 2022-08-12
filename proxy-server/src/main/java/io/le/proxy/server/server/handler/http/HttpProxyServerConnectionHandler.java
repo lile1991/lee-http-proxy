@@ -40,7 +40,7 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        log.debug("{} CONN ", ctx);
+        log.debug("CONN {}", ctx);
     }
 
     /**
@@ -51,7 +51,7 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        log.debug("{}, channelRead: {}", ctx.channel(), msg);
+        log.debug("ChannelRead: {}\r\n{}", msg, ctx.channel());
         if(msg instanceof HttpRequest) {
             // 建立或获取远端站点的连接， 转发数据
             channelReadHttpRequest(ctx, (HttpRequest) msg);
@@ -88,7 +88,7 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
                 if(future.isSuccess()) {
                     Channel clientChannel = future.channel();
                     // 连接成功， 移除ConnectionHandler, 添加ExchangeHandler
-                    log.debug("{} Successfully connected to {}:{}!", clientChannel, httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort());
+                    log.debug("Successfully connected to {}:{}!\r\n{}", httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort(), clientChannel);
 
                     // 添加Dispatcher
                     httpProxyExchangeHandler = new ProxyExchangeHandler(serverConfig, clientChannel);
@@ -124,7 +124,7 @@ public class HttpProxyServerConnectionHandler extends ChannelInboundHandlerAdapt
             if(future.isSuccess()) {
                 Channel clientChannel = future.channel();
                 // 连接成功， 移除ConnectionHandler, 添加ExchangeHandler
-                log.debug("{} Successfully connected to {}:{}!", clientChannel, httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort());
+                log.debug("Successfully connected to {}:{}!\r\n{}", httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort(), clientChannel);
 
                 // 添加Dispatcher
                 httpProxyExchangeHandler = new ProxyExchangeHandler(serverConfig, clientChannel);
