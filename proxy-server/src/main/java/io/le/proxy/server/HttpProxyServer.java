@@ -32,7 +32,11 @@ public class HttpProxyServer {
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(serverConfig.getBossGroupThreads());
         NioEventLoopGroup workerGroup = new NioEventLoopGroup(serverConfig.getWorkerGroupThreads());
-        log.debug("Proxy server bind to port: {}, protocol: {}", serverConfig.getPort(), serverConfig.getProxyProtocols());
+        if(serverConfig.getRelayServerConfig() == null) {
+            log.debug("Proxy server bind to port: {}, protocol: {}", serverConfig.getPort(), serverConfig.getProxyProtocols());
+        } else {
+            log.debug("Relay server bind to port: {}, proxy protocol: {}, relay protocol: {}", serverConfig.getPort(), serverConfig.getProxyProtocols(), serverConfig.getRelayServerConfig().getRelayProtocol());
+        }
         serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 // .handler(new LoggingHandler(LogLevel.INFO))

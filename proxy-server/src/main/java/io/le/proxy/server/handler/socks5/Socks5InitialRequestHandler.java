@@ -23,12 +23,14 @@ public class Socks5InitialRequestHandler extends SimpleChannelInboundHandler<Def
         } else {
             if(msg.version().equals(SocksVersion.SOCKS5)) {
                 if(serverConfig.getUsernamePasswordAuth() != null) {
-                    Socks5InitialResponse initialResponse = new DefaultSocks5InitialResponse(Socks5AuthMethod.PASSWORD);
-                    ctx.writeAndFlush(initialResponse);
                     // socks auth message decoder
                     ctx.pipeline().addLast(new Socks5PasswordAuthRequestDecoder());
                     // socks auth
                     ctx.pipeline().addLast(new Socks5PasswordAuthRequestHandler(serverConfig.getUsernamePasswordAuth()));
+
+                    // Response need auth message
+                    Socks5InitialResponse initialResponse = new DefaultSocks5InitialResponse(Socks5AuthMethod.PASSWORD);
+                    ctx.writeAndFlush(initialResponse);
                 } else {
                     Socks5InitialResponse initialResponse = new DefaultSocks5InitialResponse(Socks5AuthMethod.NO_AUTH);
                     ctx.writeAndFlush(initialResponse);

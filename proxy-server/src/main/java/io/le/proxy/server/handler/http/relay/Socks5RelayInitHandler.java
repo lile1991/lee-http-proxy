@@ -1,19 +1,11 @@
 package io.le.proxy.server.handler.http.relay;
 
-import io.le.proxy.server.config.ProxyProtocolEnum;
 import io.le.proxy.server.config.ProxyServerConfig;
-import io.le.proxy.server.handler.ProxyExchangeHandler;
 import io.le.proxy.server.handler.http.HttpRequestInfo;
-import io.le.proxy.server.handler.https.SslHandlerCreator;
-import io.le.proxy.server.handler.socks5.Socks5InitialRequestHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import io.netty.handler.codec.http.HttpClientCodec;
-import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.socksx.v5.Socks5ClientEncoder;
-import io.netty.handler.codec.socksx.v5.Socks5InitialRequestDecoder;
 import io.netty.handler.codec.socksx.v5.Socks5InitialResponseDecoder;
-import io.netty.handler.codec.socksx.v5.Socks5ServerEncoder;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLException;
@@ -23,13 +15,13 @@ import java.security.cert.CertificateException;
  * 与目标网站的Handler
  */
 @Slf4j
-public class RelayToSocks5ProxyInitHandler extends ChannelInitializer<Channel> {
+public class Socks5RelayInitHandler extends ChannelInitializer<Channel> {
     private final Channel proxyServerChannel;
     private final ProxyServerConfig serverConfig;
     private final HttpRequestInfo httpRequestInfo;
 
 
-    public RelayToSocks5ProxyInitHandler(Channel proxyServerChannel, ProxyServerConfig serverConfig, HttpRequestInfo httpRequestInfo) {
+    public Socks5RelayInitHandler(Channel proxyServerChannel, ProxyServerConfig serverConfig, HttpRequestInfo httpRequestInfo) {
         this.proxyServerChannel = proxyServerChannel;
         this.serverConfig = serverConfig;
         this.httpRequestInfo = httpRequestInfo;
@@ -43,10 +35,10 @@ public class RelayToSocks5ProxyInitHandler extends ChannelInitializer<Channel> {
         ch.pipeline().addLast(new Socks5InitialResponseDecoder());
         ch.pipeline().addLast(Socks5ClientEncoder.DEFAULT);
         // sock5 init
-        ch.pipeline().addLast(new Socks5InitialRequestHandler(serverConfig));
-        log.debug("Add HttpClientCodec to pipeline");
+        ch.pipeline().addLast(new Socks5RelayInitialResponseHandler(serverConfig, proxyServerChannel, httpRequestInfo));
+        log.debug("Add Socks5ClientEncoder to pipeline");
 
-        ch.pipeline().addLast(ProxyExchangeHandler.class.getSimpleName(), new ProxyExchangeHandler(serverConfig, proxyServerChannel));
-        log.debug("Add ProxyExchangeHandler to pipeline");
+        // ch.pipeline().addLast(ProxyExchangeHandler.class.getSimpleName(), new ProxyExchangeHandler(serverConfig, proxyServerChannel));
+        // log.debug("Add ProxyExchangeHandler to pipeline");
     }
 }

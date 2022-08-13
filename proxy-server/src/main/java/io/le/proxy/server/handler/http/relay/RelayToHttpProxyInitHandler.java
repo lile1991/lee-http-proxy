@@ -42,7 +42,7 @@ public class RelayToHttpProxyInitHandler extends ChannelInitializer<Channel> {
 
         if(httpRequestInfo.isSsl()) {
             // HTTPS连接需要处理一次Connect响应， 需要在ProxyExchangeHandler读取到代理服务器响应后
-            ch.pipeline().addLast(RelayShakeHandsHandler.class.getSimpleName(), new RelayShakeHandsHandler(serverConfig, proxyServerChannel));
+            ch.pipeline().addLast(HttpsRelayShakeHandsHandler.class.getSimpleName(), new HttpsRelayShakeHandsHandler(serverConfig, proxyServerChannel));
         } else {
             ch.pipeline().addLast(ProxyExchangeHandler.class.getSimpleName(), new ProxyExchangeHandler(serverConfig, proxyServerChannel));
         }

@@ -12,11 +12,11 @@ import lombok.extern.slf4j.Slf4j;
  * 与真实Proxy Server握手处理器
  */
 @Slf4j
-public class RelayShakeHandsHandler extends ChannelInboundHandlerAdapter {
+public class HttpsRelayShakeHandsHandler extends ChannelInboundHandlerAdapter {
     private final ProxyServerConfig serverConfig;
     private final Channel proxyServerChannel;
 
-    public RelayShakeHandsHandler(ProxyServerConfig serverConfig, Channel proxyServerChannel) {
+    public HttpsRelayShakeHandsHandler(ProxyServerConfig serverConfig, Channel proxyServerChannel) {
         this.serverConfig = serverConfig;
         this.proxyServerChannel = proxyServerChannel;
     }
@@ -35,6 +35,7 @@ public class RelayShakeHandsHandler extends ChannelInboundHandlerAdapter {
                 // 中继都不解码消息， 移除代理服务器的解码器
                 proxyServerChannel.pipeline().remove(HttpServerCodec.class);
                 proxyServerChannel.pipeline().remove(HttpObjectAggregator.class);
+                log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
                 proxyServerChannel.pipeline().addLast(new ProxyExchangeHandler(serverConfig, ctx.channel()));
                 log.debug("Remove HttpServerCodec from pipeline");
 
@@ -45,7 +46,7 @@ public class RelayShakeHandsHandler extends ChannelInboundHandlerAdapter {
 //                    ctx.pipeline().remove(SslHandler.class);
 //                }
                 ctx.pipeline().addLast(new ProxyExchangeHandler(serverConfig, proxyServerChannel));
-                log.debug("Add ProxyExchangeHandler to ProxyServerPipeline and RelayServerPipeline.");
+                log.debug("Add ProxyExchangeHandler to relay server pipeline.");
             }));
         } else {
             proxyServerChannel.writeAndFlush(response).addListener(f -> {
