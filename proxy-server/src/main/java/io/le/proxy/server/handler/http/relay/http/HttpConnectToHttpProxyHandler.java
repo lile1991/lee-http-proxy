@@ -97,6 +97,9 @@ public class HttpConnectToHttpProxyHandler extends ChannelInboundHandlerAdapter 
         });
     }
 
+    /**
+     * 连接到目标代理， 支持HTTP与HTTPS协议
+     */
     private ChannelFuture connectTargetProxy(ChannelHandlerContext ctx, HttpRequest request) {
         httpRequestInfo = new HttpRequestInfo(request);
         RelayServerConfig relayServerConfig = serverConfig.getRelayServerConfig();
