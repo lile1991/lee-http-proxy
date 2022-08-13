@@ -53,12 +53,12 @@ public class ProxyUnificationServerHandler extends ChannelInboundHandlerAdapter 
         switch (protocol) {
             case HTTP: addHttpHandles(ctx); break;
             case HTTPS: addHttpsHandlers(ctx); break;
+            case SOCKS5:
+                addSocks5Handler(ctx); break;
             case SOCKS4a:
                 p.addAfter(ctx.name(), null, Socks4ServerEncoder.INSTANCE);
                 p.addAfter(ctx.name(), null, new Socks4ServerDecoder());
                 break;
-            case SOCKS5:
-                addSocks5Handler(ctx); break;
             default:
                 ctx.write(ctx.alloc().buffer().writeCharSequence("Proxy protocol not supported.", StandardCharsets.UTF_8))
                         .addListener(ChannelFutureListener.CLOSE);
