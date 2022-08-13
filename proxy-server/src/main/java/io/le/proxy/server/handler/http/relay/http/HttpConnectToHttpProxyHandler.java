@@ -3,7 +3,6 @@ package io.le.proxy.server.handler.http.relay.http;
 import io.le.proxy.server.config.*;
 import io.le.proxy.server.handler.ProxyExchangeHandler;
 import io.le.proxy.server.handler.http.HttpRequestInfo;
-import io.le.proxy.server.handler.http.relay.https.HttpConnectToHttpsProxyInitHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -115,8 +114,8 @@ public class HttpConnectToHttpProxyHandler extends ChannelInboundHandlerAdapter 
                 // .remoteAddress(serverIp, randomSystemPort)
                 ;
         switch (relayProtocol) {
-            case HTTP: bootstrap.handler(new HttpConnectToHttpProxyInitHandler(ctx.channel(), serverConfig, httpRequestInfo)); break;
-            case HTTPS: bootstrap.handler(new HttpConnectToHttpsProxyInitHandler(ctx.channel(), serverConfig, httpRequestInfo)); break;
+            case HTTP:
+            case HTTPS: bootstrap.handler(new HttpConnectToHttpProxyInitHandler(ctx.channel(), serverConfig, httpRequestInfo)); break;
             default:
                 ByteBuf responseBody = ctx.alloc().buffer();
                 responseBody.writeCharSequence("Unsupported relay protocol " + relayProtocol, StandardCharsets.UTF_8);
@@ -128,7 +127,6 @@ public class HttpConnectToHttpProxyHandler extends ChannelInboundHandlerAdapter 
             // Bind local net address
             bootstrap.remoteAddress(serverConfig.getLocalAddress());
         }
-
 
         NetAddress relayNetAddress = relayServerConfig.getRelayNetAddress();
         return bootstrap.connect(relayNetAddress.getRemoteHost(), relayNetAddress.getRemotePort());

@@ -1,11 +1,13 @@
 package io.le.proxy.server.handler.http.relay.http;
 
+import io.le.proxy.server.config.ProxyProtocolEnum;
 import io.le.proxy.server.config.ProxyServerConfig;
 import io.le.proxy.server.handler.ProxyExchangeHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
+import io.netty.handler.ssl.SslHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -41,6 +43,9 @@ public class HttpsConnectRelayShakeHandsHandler extends ChannelInboundHandlerAda
                 ctx.pipeline().remove(ctx.name());
                 ctx.pipeline().remove(HttpClientCodec.class);
                 ctx.pipeline().remove(HttpObjectAggregator.class);
+//                if(serverConfig.getRelayServerConfig().getRelayProtocol() == ProxyProtocolEnum.HTTPS) {
+//                    ctx.pipeline().remove(SslHandler.class);
+//                }
                 ctx.pipeline().addLast(new ProxyExchangeHandler(serverConfig, proxyServerChannel));
                 log.debug("Add ProxyExchangeHandler to ProxyServerPipeline and RelayServerPipeline.");
             }));

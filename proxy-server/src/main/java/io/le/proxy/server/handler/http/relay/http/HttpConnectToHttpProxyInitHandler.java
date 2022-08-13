@@ -1,8 +1,10 @@
 package io.le.proxy.server.handler.http.relay.http;
 
+import io.le.proxy.server.config.ProxyProtocolEnum;
 import io.le.proxy.server.config.ProxyServerConfig;
 import io.le.proxy.server.handler.ProxyExchangeHandler;
 import io.le.proxy.server.handler.http.HttpRequestInfo;
+import io.le.proxy.server.handler.https.SslHandlerCreator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.http.HttpClientCodec;
@@ -10,6 +12,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLException;
+import java.security.cert.CertificateException;
 
 /**
  * 与目标网站的Handler
@@ -28,8 +31,11 @@ public class HttpConnectToHttpProxyInitHandler extends ChannelInitializer<Channe
     }
 
     @Override
-    protected void initChannel(Channel ch) throws SSLException {
+    protected void initChannel(Channel ch) throws SSLException, CertificateException {
         // ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
+        if(serverConfig.getRelayServerConfig().getRelayProtocol() == ProxyProtocolEnum.HTTPS) {
+            ch.pipeline().addLast(SslHandlerCreator.forClient(ch.alloc()));
+        }
         ch.pipeline().addLast(new HttpClientCodec());
         ch.pipeline().addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
         log.debug("Add HttpClientCodec to pipeline");

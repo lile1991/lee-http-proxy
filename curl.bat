@@ -6,3 +6,7 @@ curl --proxy-insecure -v -x  https://127.0.0.1:40000 https://ipinfo.io -k
 
 # socks5代理
 curl -v -x  socks5://127.0.0.1:40000 https://ipinfo.io
+
+
+# 中继代理
+curl -v -x  http://auh:456789@127.0.0.1:40001 https://ipinfo.io -k
