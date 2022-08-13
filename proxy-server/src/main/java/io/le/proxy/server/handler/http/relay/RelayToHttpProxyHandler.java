@@ -1,4 +1,4 @@
-package io.le.proxy.server.handler.http.relay.http;
+package io.le.proxy.server.handler.http.relay;
 
 import io.le.proxy.server.config.*;
 import io.le.proxy.server.handler.ProxyExchangeHandler;
@@ -15,15 +15,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
- * Relay中继， 连接到另一个HTTP代理
+ * Relay中继， 连接到另一个HTTP/HTTPS代理
  */
 @Slf4j
-public class HttpConnectToHttpProxyHandler extends ChannelInboundHandlerAdapter {
+public class RelayToHttpProxyHandler extends ChannelInboundHandlerAdapter {
 
     HttpRequestInfo httpRequestInfo;
     final ProxyServerConfig serverConfig;
 
-    public HttpConnectToHttpProxyHandler(ProxyServerConfig serverConfig) {
+    public RelayToHttpProxyHandler(ProxyServerConfig serverConfig) {
         this.serverConfig = serverConfig;
     }
 
@@ -118,7 +118,8 @@ public class HttpConnectToHttpProxyHandler extends ChannelInboundHandlerAdapter 
                 ;
         switch (relayProtocol) {
             case HTTP:
-            case HTTPS: bootstrap.handler(new HttpConnectToHttpProxyInitHandler(ctx.channel(), serverConfig, httpRequestInfo)); break;
+            case HTTPS: bootstrap.handler(new RelayToHttpProxyInitHandler(ctx.channel(), serverConfig, httpRequestInfo)); break;
+            case SOCKS5: bootstrap.handler(new RelayToSocks5ProxyInitHandler(ctx.channel(), serverConfig, httpRequestInfo)); break;
             default:
                 ByteBuf responseBody = ctx.alloc().buffer();
                 responseBody.writeCharSequence("Unsupported relay protocol " + relayProtocol, StandardCharsets.UTF_8);

@@ -1,24 +1,22 @@
-package io.le.proxy.server.handler.http.relay.http;
+package io.le.proxy.server.handler.http.relay;
 
-import io.le.proxy.server.config.ProxyProtocolEnum;
 import io.le.proxy.server.config.ProxyServerConfig;
 import io.le.proxy.server.handler.ProxyExchangeHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
-import io.netty.handler.ssl.SslHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * 与真实Proxy Server握手处理器
  */
 @Slf4j
-public class HttpsConnectRelayShakeHandsHandler extends ChannelInboundHandlerAdapter {
+public class RelayShakeHandsHandler extends ChannelInboundHandlerAdapter {
     private final ProxyServerConfig serverConfig;
     private final Channel proxyServerChannel;
 
-    public HttpsConnectRelayShakeHandsHandler(ProxyServerConfig serverConfig, Channel proxyServerChannel) {
+    public RelayShakeHandsHandler(ProxyServerConfig serverConfig, Channel proxyServerChannel) {
         this.serverConfig = serverConfig;
         this.proxyServerChannel = proxyServerChannel;
     }
