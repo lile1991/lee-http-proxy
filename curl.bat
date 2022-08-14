@@ -10,4 +10,4 @@ curl -v -x  socks5://auh:123123@127.0.0.1:40000 https://ipinfo.io
 
 # 中继代理
 curl -v -x  http://auh:456789@127.0.0.1:40001 https://ipinfo.io -k
-curl -v -x  http://auh:456789@127.0.0.1:40001 https://ipinfo.io -k
+curl -v -x  http://auh:456789@127.0.0.1:40001 http://ipinfo.io -k

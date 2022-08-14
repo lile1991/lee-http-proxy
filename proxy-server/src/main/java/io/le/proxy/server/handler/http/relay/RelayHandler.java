@@ -3,6 +3,8 @@ package io.le.proxy.server.handler.http.relay;
 import io.le.proxy.server.config.*;
 import io.le.proxy.server.handler.ProxyExchangeHandler;
 import io.le.proxy.server.handler.http.HttpRequestInfo;
+import io.le.proxy.server.handler.http.relay.http.HttpRelayInitHandler;
+import io.le.proxy.server.handler.http.relay.socks5.Socks5RelayInitHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -131,7 +133,7 @@ public class RelayHandler extends ChannelInboundHandlerAdapter {
                 ;
         switch (relayProtocol) {
             case HTTP:
-            case HTTPS: bootstrap.handler(new RelayToHttpProxyInitHandler(ctx.channel(), serverConfig, httpRequestInfo)); break;
+            case HTTPS: bootstrap.handler(new HttpRelayInitHandler(ctx.channel(), serverConfig, httpRequestInfo)); break;
             case SOCKS5: bootstrap.handler(new Socks5RelayInitHandler(ctx.channel(), serverConfig, httpRequestInfo)); break;
             default:
                 ByteBuf responseBody = ctx.alloc().buffer();

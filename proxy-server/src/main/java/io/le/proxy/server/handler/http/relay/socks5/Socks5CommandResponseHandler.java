@@ -1,4 +1,4 @@
-package io.le.proxy.server.handler.http.relay;
+package io.le.proxy.server.handler.http.relay.socks5;
 
 import io.le.proxy.server.config.ProxyServerConfig;
 import io.le.proxy.server.handler.ProxyExchangeHandler;
@@ -34,15 +34,15 @@ public class Socks5CommandResponseHandler extends ChannelInboundHandlerAdapter {
             log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
             proxyServerChannel.pipeline().addLast(new ProxyExchangeHandler(serverConfig, ctx.channel()));
 
-            ctx.pipeline().remove(Socks5ClientEncoder.class);
+            // ctx.pipeline().remove(Socks5ClientEncoder.class);
             log.debug("Add HttpClientCodec to relay client pipeline.");
-            ctx.pipeline().addBefore(ctx.name(), null, new HttpClientCodec());
-            ctx.pipeline().addBefore(ctx.name(), null, new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
+            ctx.pipeline().addAfter(ctx.name(), null, new HttpClientCodec());
+            ctx.pipeline().addAfter(ctx.name(), null, new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
 
             ctx.pipeline().remove(Socks5CommandResponseDecoder.class);
             ctx.pipeline().remove(ctx.name());
 
-            log.debug("write http request to remote.\r\n{}", ctx);
+            log.debug("Write http request to remote.\r\n{}", ctx);
             ctx.writeAndFlush(httpRequestInfo);
         } else {
             log.error("decoderResult is {}, close channel", socks5Command.decoderResult());

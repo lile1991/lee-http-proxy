@@ -1,4 +1,4 @@
-package io.le.proxy.server.handler.http.relay;
+package io.le.proxy.server.handler.http.relay.socks5;
 
 import io.le.proxy.server.config.ProxyServerConfig;
 import io.le.proxy.server.config.RelayServerConfig;
