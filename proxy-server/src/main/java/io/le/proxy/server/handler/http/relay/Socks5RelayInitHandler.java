@@ -6,6 +6,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.socksx.v5.Socks5ClientEncoder;
 import io.netty.handler.codec.socksx.v5.Socks5InitialResponseDecoder;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLException;
@@ -29,7 +31,7 @@ public class Socks5RelayInitHandler extends ChannelInitializer<Channel> {
 
     @Override
     protected void initChannel(Channel ch) throws SSLException, CertificateException {
-        // ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
+        ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
         // Socks5MessageByteBuf
         // sock5 init
         ch.pipeline().addLast(new Socks5InitialResponseDecoder());

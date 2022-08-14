@@ -1,13 +1,10 @@
 package io.le.proxy.server.handler.http.relay;
 
 import io.le.proxy.server.config.ProxyServerConfig;
-import io.le.proxy.server.handler.ProxyExchangeHandler;
 import io.le.proxy.server.handler.http.HttpRequestInfo;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.socksx.v5.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,8 +26,13 @@ public class Socks5PasswordAuthResponseHandler extends ChannelInboundHandlerAdap
             log.debug("Socks5 auth success");
 
             log.debug("Add Socks5CommandResponseHandler to relay server pipeline.");
+            // 增加CommandHandler
             ctx.pipeline().addAfter(ctx.name(), null, new Socks5CommandResponseHandler(serverConfig, proxyServerChannel, httpRequestInfo));
-            ctx.pipeline().addAfter(ctx.name(), null, new Socks5CommandRequestDecoder());
+            ctx.pipeline().addAfter(ctx.name(), null, new Socks5CommandResponseDecoder());
+
+            // 鉴权请求Handler不要了
+            ctx.pipeline().remove(Socks5PasswordAuthResponseDecoder.class);
+            ctx.pipeline().remove(ctx.name());
 
             // log.debug("Add ProxyExchangeHandler to relay server pipeline.");
             // ctx.pipeline().addAfter(ctx.name(), null, new ProxyExchangeHandler(serverConfig, proxyServerChannel));
@@ -38,7 +40,6 @@ public class Socks5PasswordAuthResponseHandler extends ChannelInboundHandlerAdap
             // log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
             // proxyServerChannel.pipeline().addLast(new ProxyExchangeHandler(serverConfig, ctx.channel()));
 
-            ctx.pipeline().remove(ctx.name());
             // ctx.pipeline().remove(Socks5ClientEncoder.class);
 
             DefaultSocks5CommandRequest socks5CommandRequest = new DefaultSocks5CommandRequest(Socks5CommandType.CONNECT,

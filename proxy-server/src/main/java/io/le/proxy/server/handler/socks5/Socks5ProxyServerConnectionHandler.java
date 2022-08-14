@@ -49,6 +49,7 @@ public class Socks5ProxyServerConnectionHandler extends SimpleChannelInboundHand
             });
 
             ctx.pipeline().remove(ctx.name());
+            ctx.pipeline().remove(Socks5CommandRequestDecoder.class);
         }/* else {
             // never execute
             log.warn("Socks5 channelRead0 {}", msg);
