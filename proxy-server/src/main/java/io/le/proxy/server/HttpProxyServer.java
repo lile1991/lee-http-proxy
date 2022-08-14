@@ -46,7 +46,7 @@ public class HttpProxyServer {
                         ch.pipeline()
                             // .addLast(new LoggingHandler())
                                 // Time out process
-                            .addLast(new IdleStateHandler(3, 30, 0))
+                            // .addLast(new IdleStateHandler(3, 30, 0))
                             .addLast(new ProxyUnificationServerHandler(serverConfig));
                     }
                 }).bind(serverConfig.getPort());

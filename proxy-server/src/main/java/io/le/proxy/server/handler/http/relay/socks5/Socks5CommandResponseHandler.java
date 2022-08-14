@@ -7,8 +7,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.DecoderResult;
-import io.netty.handler.codec.http.HttpClientCodec;
-import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.socksx.v5.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,14 +35,16 @@ public class Socks5CommandResponseHandler extends ChannelInboundHandlerAdapter {
 
             // ctx.pipeline().remove(Socks5ClientEncoder.class);
             log.debug("Add HttpClientCodec to relay client pipeline.");
-            ctx.pipeline().addAfter(ctx.name(), null, new HttpClientCodec());
-            ctx.pipeline().addAfter(ctx.name(), null, new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
+            ctx.pipeline().addAfter(ctx.name(), null, new HttpRequestEncoder());
 
+            ctx.pipeline().remove(Socks5ClientEncoder.class);
             ctx.pipeline().remove(Socks5CommandResponseDecoder.class);
             ctx.pipeline().remove(ctx.name());
 
             log.debug("Write http request to remote.\r\n{}", ctx);
-            ctx.writeAndFlush(httpRequestInfo);
+            ctx.writeAndFlush(httpRequestInfo.getHttpRequest()).addListener(f -> {
+                ctx.pipeline().remove(HttpRequestEncoder.class);
+            });
         } else {
             log.error("decoderResult is {}, close channel", socks5Command.decoderResult());
             ctx.close();
