@@ -31,7 +31,7 @@ public class Socks5RelayInitHandler extends ChannelInitializer<Channel> {
 
     @Override
     protected void initChannel(Channel ch) {
-        // ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
+        // ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
         // Socks5MessageByteBuf
         ch.pipeline().addLast(Socks5ClientEncoder.DEFAULT);
         // sock5 init

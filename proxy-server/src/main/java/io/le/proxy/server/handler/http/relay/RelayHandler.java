@@ -40,17 +40,6 @@ public class RelayHandler extends ChannelInboundHandlerAdapter {
 
         RelayServerConfig relayServerConfig = serverConfig.getRelayServerConfig();
         NetAddress relayNetAddress = relayServerConfig.getRelayNetAddress();
-        // 设置远程代理服务器密码
-        UsernamePasswordAuth relayUsernamePasswordAuth = relayServerConfig.getRelayUsernamePasswordAuth();
-        if(relayUsernamePasswordAuth == null) {
-            request.headers().remove(HttpHeaderNames.PROXY_AUTHORIZATION.toString());
-        } else {
-            request.headers().set(HttpHeaderNames.PROXY_AUTHORIZATION.toString(),
-                    "Basic " + Base64.getEncoder().encodeToString(
-                            (relayUsernamePasswordAuth.getUsername() + ":" + relayUsernamePasswordAuth.getPassword()).getBytes(StandardCharsets.UTF_8)
-                    )
-            );
-        }
 
         ctx.pipeline().remove(ctx.name());
 
@@ -64,17 +53,32 @@ public class RelayHandler extends ChannelInboundHandlerAdapter {
 
                     switch (serverConfig.getRelayServerConfig().getRelayProtocol()) {
                         case HTTP:
-                        case HTTPS:
+                        case HTTPS: {
+                            // 设置远程代理服务器密码
+                            UsernamePasswordAuth relayUsernamePasswordAuth = relayServerConfig.getRelayUsernamePasswordAuth();
+                            if (relayUsernamePasswordAuth == null) {
+                                request.headers().remove(HttpHeaderNames.PROXY_AUTHORIZATION.toString());
+                            } else {
+                                request.headers().set(HttpHeaderNames.PROXY_AUTHORIZATION.toString(),
+                                        "Basic " + Base64.getEncoder().encodeToString(
+                                                (relayUsernamePasswordAuth.getUsername() + ":" + relayUsernamePasswordAuth.getPassword()).getBytes(StandardCharsets.UTF_8)
+                                        )
+                                );
+                            }
+
                             // 发送Connection请求到目标服务器, HTTPS握手交给{HttpsConnectedToShakeHandsHandler}做
                             log.debug("Write CONNECT request: {}\r\n{}", request, clientChannel);
                             clientChannel.writeAndFlush(request);
                             return;
-                        case SOCKS5:
+                        }
+                        case SOCKS5: {
                             // Socks5 initial request
+                            UsernamePasswordAuth relayUsernamePasswordAuth = relayServerConfig.getRelayUsernamePasswordAuth();
                             DefaultSocks5InitialRequest socks5InitialRequest = new DefaultSocks5InitialRequest(relayUsernamePasswordAuth == null ? Socks5AuthMethod.NO_AUTH : Socks5AuthMethod.PASSWORD);
                             log.debug("Write socks5InitialRequest to {}", clientChannel.remoteAddress());
                             clientChannel.writeAndFlush(socks5InitialRequest);
                             return;
+                        }
                     }
                 } else {
                     log.error("Failed connect to {}:{}\r\b{}", relayNetAddress.getRemoteHost(), relayNetAddress.getRemotePort(), ctx);
@@ -101,17 +105,32 @@ public class RelayHandler extends ChannelInboundHandlerAdapter {
 
                 switch (serverConfig.getRelayServerConfig().getRelayProtocol()) {
                     case HTTP:
-                    case HTTPS:
+                    case HTTPS: {
+                        // 设置远程代理服务器密码
+                        UsernamePasswordAuth relayUsernamePasswordAuth = relayServerConfig.getRelayUsernamePasswordAuth();
+                        if (relayUsernamePasswordAuth == null) {
+                            request.headers().remove(HttpHeaderNames.PROXY_AUTHORIZATION.toString());
+                        } else {
+                            request.headers().set(HttpHeaderNames.PROXY_AUTHORIZATION.toString(),
+                                    "Basic " + Base64.getEncoder().encodeToString(
+                                            (relayUsernamePasswordAuth.getUsername() + ":" + relayUsernamePasswordAuth.getPassword()).getBytes(StandardCharsets.UTF_8)
+                                    )
+                            );
+                        }
+
                         // 转发消息给目标代理
                         log.debug("Write msg to {}", request.method() + " " + request.uri());
                         clientChannel.writeAndFlush(request);
                         return;
-                    case SOCKS5:
+                    }
+                    case SOCKS5: {
                         // Socks5 initial request
+                        UsernamePasswordAuth relayUsernamePasswordAuth = relayServerConfig.getRelayUsernamePasswordAuth();
                         DefaultSocks5InitialRequest socks5InitialRequest = new DefaultSocks5InitialRequest(relayUsernamePasswordAuth == null ? Socks5AuthMethod.NO_AUTH : Socks5AuthMethod.PASSWORD);
                         log.debug("Write socks5InitialRequest to {}", clientChannel.remoteAddress());
                         clientChannel.writeAndFlush(socks5InitialRequest);
                         return;
+                    }
                 }
             } else {
                 log.error("Failed connect to {}:{}\r\b{}", relayNetAddress.getRemoteHost(), relayNetAddress.getRemotePort(), ctx);
