@@ -1,3 +1,5 @@
+# 项目已迁移到： https://github.com/lile1991/ml-proxy-server
+
 ## 代理模式
 ### 开启代理服务器：
 1. 端口绑定为40000
