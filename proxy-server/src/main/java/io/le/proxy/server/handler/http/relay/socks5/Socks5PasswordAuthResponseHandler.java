@@ -1,12 +1,16 @@
 package io.le.proxy.server.handler.http.relay.socks5;
 
 import io.le.proxy.server.config.ProxyServerConfig;
+import io.le.proxy.server.handler.http.HttpAcceptConnectHandler;
 import io.le.proxy.server.handler.http.HttpRequestInfo;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.socksx.v5.*;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.swing.event.ChangeListener;
 
 @Slf4j
 public class Socks5PasswordAuthResponseHandler extends ChannelInboundHandlerAdapter {
@@ -40,6 +44,9 @@ public class Socks5PasswordAuthResponseHandler extends ChannelInboundHandlerAdap
             ctx.writeAndFlush(socks5CommandRequest);
         } else {
             log.debug("Socks5 auth failure");
+            HttpAcceptConnectHandler.response407ProxyAuthenticationRequired(proxyServerChannel, httpRequestInfo.getHttpRequest().protocolVersion(), "Incorrect socks5 proxy username or password")
+                    .addListener(ChannelFutureListener.CLOSE);
+            ctx.close();
         }
     }
 }

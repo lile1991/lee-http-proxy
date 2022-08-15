@@ -107,9 +107,6 @@ public class RelayHandler extends ChannelInboundHandlerAdapter {
                         clientChannel.writeAndFlush(request);
                         return;
                     case SOCKS5:
-                        log.debug("Remove HttpServerCodec from proxy server pipeline.");
-                        ctx.pipeline().remove(HttpServerCodec.class);
-
                         // Socks5 initial request
                         DefaultSocks5InitialRequest socks5InitialRequest = new DefaultSocks5InitialRequest(relayUsernamePasswordAuth == null ? Socks5AuthMethod.NO_AUTH : Socks5AuthMethod.PASSWORD);
                         log.debug("Write socks5InitialRequest to {}", clientChannel.remoteAddress());

@@ -60,7 +60,15 @@ public class Socks5CommandResponseHandler extends ChannelInboundHandlerAdapter {
 
                 log.debug("Write the first http request to remote.\r\n{}", ctx);
                 ctx.writeAndFlush(httpRequestInfo.getHttpRequest()).addListener(f -> {
+                    log.debug("Remove HttpServerCodec from proxy server pipeline.");
+                    proxyServerChannel.pipeline().remove(HttpServerCodec.class);
+                    proxyServerChannel.pipeline().remove(HttpObjectAggregator.class);
+
                     ctx.pipeline().remove(HttpRequestEncoder.class);
+
+                    // log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
+                    // proxyServerChannel.pipeline().addLast(new ExchangeHandler(serverConfig, ctx.channel()));
+
                     log.debug("Add ProxyExchangeHandler to relay server pipeline.");
                     ctx.pipeline().addLast(new ExchangeHandler(serverConfig, proxyServerChannel));
                 });
