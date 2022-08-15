@@ -2,7 +2,6 @@ package io.le.proxy.server.handler.http.relay.http;
 
 import io.le.proxy.server.config.ProxyProtocolEnum;
 import io.le.proxy.server.config.ProxyServerConfig;
-import io.le.proxy.server.handler.ExchangeHandler;
 import io.le.proxy.server.handler.http.HttpRequestInfo;
 import io.le.proxy.server.handler.https.SslHandlerCreator;
 import io.netty.channel.Channel;
@@ -19,9 +18,9 @@ import java.security.cert.CertificateException;
  */
 @Slf4j
 public class HttpRelayInitHandler extends ChannelInitializer<Channel> {
-    private final Channel proxyServerChannel;
-    private final ProxyServerConfig serverConfig;
-    private final HttpRequestInfo httpRequestInfo;
+    final Channel proxyServerChannel;
+    final ProxyServerConfig serverConfig;
+    final HttpRequestInfo httpRequestInfo;
 
 
     public HttpRelayInitHandler(Channel proxyServerChannel, ProxyServerConfig serverConfig, HttpRequestInfo httpRequestInfo) {
@@ -36,12 +35,12 @@ public class HttpRelayInitHandler extends ChannelInitializer<Channel> {
         if(serverConfig.getRelayServerConfig().getRelayProtocol() == ProxyProtocolEnum.HTTPS) {
             ch.pipeline().addLast(SslHandlerCreator.forClient(ch.alloc()));
         }
+        log.debug("Add HttpClientCodec to pipeline");
         ch.pipeline().addLast(new HttpClientCodec());
         ch.pipeline().addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
-        log.debug("Add HttpClientCodec to pipeline");
 
         // HTTP shake hands
-        ch.pipeline().addLast(HttpsRelayShakeHandsHandler.class.getSimpleName(), new HttpsRelayShakeHandsHandler(serverConfig, proxyServerChannel));
         log.debug("Add ProxyExchangeHandler to pipeline");
+        ch.pipeline().addLast(HttpsRelayShakeHandsHandler.class.getSimpleName(), new HttpsRelayShakeHandsHandler(serverConfig, proxyServerChannel));
     }
 }

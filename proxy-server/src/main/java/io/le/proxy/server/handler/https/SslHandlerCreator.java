@@ -1,7 +1,6 @@
 package io.le.proxy.server.handler.https;
 
 import io.netty.buffer.ByteBufAllocator;
-import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.http2.Http2SecurityUtil;
 import io.netty.handler.ssl.*;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;

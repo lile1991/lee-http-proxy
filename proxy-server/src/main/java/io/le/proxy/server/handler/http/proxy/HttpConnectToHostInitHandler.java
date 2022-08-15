@@ -23,23 +23,6 @@ public class HttpConnectToHostInitHandler extends ChannelInitializer<Channel> {
 
     @Override
     protected void initChannel(Channel ch) {
-        // ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
-
-        // 解码器放到HttpConnectToRemoteHandler去添加
-        /*if(httpRequestInfo.isSsl()) {
-            if(serverConfig.isCodecMsg()) {
-                SslContext sslCtx = SslContextBuilder
-                        .forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
-                ch.pipeline().addFirst(sslCtx.newHandler(ch.alloc(), httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort()));
-                // ch.pipeline().addLast(new HttpContentDecompressor());
-                ch.pipeline().addLast(new HttpClientCodec());
-                ch.pipeline().addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
-            }
-        } else {
-            // ch.pipeline().addLast(new HttpContentDecompressor());
-            ch.pipeline().addLast(new HttpClientCodec());
-            ch.pipeline().addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
-        }*/
         ch.pipeline().addLast(ExchangeHandler.class.getSimpleName(), new ExchangeHandler(serverConfig, proxyServerChannel));
     }
 }
