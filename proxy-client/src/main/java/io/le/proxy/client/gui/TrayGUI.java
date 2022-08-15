@@ -1,6 +1,6 @@
-package io.le.proxy.client.gui;
+package io.ml.proxy.client.gui;
 
-import io.le.proxy.client.gui.settings.Settings;
+import io.ml.proxy.client.gui.settings.Settings;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;

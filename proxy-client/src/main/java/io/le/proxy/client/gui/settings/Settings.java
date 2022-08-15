@@ -1,11 +1,11 @@
-package io.le.proxy.client.gui.settings;
+package io.ml.proxy.client.gui.settings;
 
-import io.le.proxy.client.HttpProxyRelayClient;
-import io.le.proxy.client.gui.TrayGUI;
-import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
-import io.le.proxy.server.relay.config.ReplayRuleConfig;
-import io.le.proxy.server.config.ProxyProtocolEnum;
-import io.le.proxy.utils.lang.StringUtils;
+import io.ml.proxy.client.HttpProxyRelayClient;
+import io.ml.proxy.client.gui.TrayGUI;
+import io.ml.proxy.server.relay.config.HttpProxyRelayServerConfig;
+import io.ml.proxy.server.relay.config.ReplayRuleConfig;
+import io.ml.proxy.server.config.ProxyProtocolEnum;
+import io.ml.proxy.utils.lang.StringUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 

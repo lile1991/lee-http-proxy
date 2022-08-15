@@ -1,8 +1,8 @@
-package io.le;
+package io.ml;
 
-import io.le.proxy.client.HttpProxyRelayClient;
-import io.le.proxy.client.gui.TrayGUI;
-import io.le.proxy.client.gui.settings.Settings;
+import io.ml.proxy.client.HttpProxyRelayClient;
+import io.ml.proxy.client.gui.TrayGUI;
+import io.ml.proxy.client.gui.settings.Settings;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;

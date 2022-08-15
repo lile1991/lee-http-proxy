@@ -1,7 +1,7 @@
-package io.le.proxy.client;
+package io.ml.proxy.client;
 
-import io.le.proxy.server.relay.HttpProxyRelayServer;
-import io.le.proxy.server.relay.config.HttpProxyRelayServerConfig;
+import io.ml.proxy.server.relay.HttpProxyRelayServer;
+import io.ml.proxy.server.relay.config.HttpProxyRelayServerConfig;
 import lombok.Getter;
 
 public class HttpProxyRelayClient {

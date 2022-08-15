@@ -36,7 +36,7 @@
     </appender>
 
     <logger name="io.netty.handler.ssl" level="WARN" />
-    <logger name="io.le" level="DEBUG" />
+    <logger name="io.ml" level="DEBUG" />
 
     <!-- 日志输出级别 -->
     <root level="WARN" additivity="false">

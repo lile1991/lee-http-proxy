@@ -1,7 +1,7 @@
-package io.le.proxy.client.gui.settings;
+package io.ml.proxy.client.gui.settings;
 
-import io.le.proxy.client.config.SettingsConfReader;
-import io.le.proxy.utils.io.FileUtils;
+import io.ml.proxy.client.config.SettingsConfReader;
+import io.ml.proxy.utils.io.FileUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
