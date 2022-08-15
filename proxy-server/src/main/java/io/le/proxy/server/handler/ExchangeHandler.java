@@ -27,14 +27,6 @@ public class ExchangeHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        if(log.isDebugEnabled()) {
-            if(msg instanceof HttpObject) {
-                log.debug("Read a message {} from remote: \r\n{}\r\n{}", msg.getClass().getSimpleName(), msg, exchangeChannel);
-            } else {
-                log.debug("Read a message {} from remote: \r\n{}\r\n{}", msg.getClass().getSimpleName(), msg, exchangeChannel);
-            }
-        }
-
         log.debug("Forward the message. \r\n{}\r\n{}", msg, exchangeChannel);
         exchangeChannel.writeAndFlush(msg);
     }

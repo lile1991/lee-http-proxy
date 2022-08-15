@@ -49,9 +49,6 @@ public class Socks5CommandResponseHandler extends ChannelInboundHandlerAdapter {
                             proxyServerChannel.pipeline().addLast(new ExchangeHandler(serverConfig, ctx.channel()));
                             log.debug("Remove HttpServerCodec from pipeline");
 
-                            ctx.pipeline().remove(ctx.name());
-                            ctx.pipeline().remove(HttpClientCodec.class);
-                            ctx.pipeline().remove(HttpObjectAggregator.class);
                             ctx.pipeline().addLast(new ExchangeHandler(serverConfig, proxyServerChannel));
                             log.debug("Add ProxyExchangeHandler to relay server pipeline.");
                         });
