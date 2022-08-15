@@ -40,7 +40,7 @@ curl -v -x socks5://auh:123123@127.0.0.1:40000 https://ipinfo.io
 // 打开中继服务器
 // 支持HTTP、HTTPS 代理协议, 可中继到HTTP、HTTPS、SOCKS5代理服务器
 HttpProxyServer httpProxyServer = new HttpProxyServer();
-// 配置代理服务器， 支持HTTP、HTTPS协议， 后续也会支持SOCKS5
+// 暴露HTTP、HTTPS代理服务协议， 后续也会支持SOCKS5
 ProxyServerConfig httpProxyServerConfig = new ProxyServerConfig();
 httpProxyServerConfig.setProxyProtocols(Arrays.asList(ProxyProtocolEnum.HTTP,
     ProxyProtocolEnum.HTTPS
@@ -56,14 +56,14 @@ httpProxyServerConfig.setWorkerGroupThreads(10);
 // 配置真实代理服务器， 中继到SOCKS5服务
 RelayServerConfig relayServerConfig = new RelayServerConfig();
 relayServerConfig.setRelayProtocol(ProxyProtocolEnum.SOCKS5);
-relayServerConfig.setRelayNetAddress(new NetAddress("194.156.225.1", 7346));
-relayServerConfig.setRelayUsernamePasswordAuth(new UsernamePasswordAuth("kkiywkmu", "md5ggfgmfos7"));
+relayServerConfig.setRelayNetAddress(new NetAddress("127.0.0.1", 40000));
+relayServerConfig.setRelayUsernamePasswordAuth(new UsernamePasswordAuth("auh", "123123"));
 httpProxyServerConfig.setRelayServerConfig(relayServerConfig);
 
 // 启动中继服务
 httpProxyServer.start(httpProxyServerConfig);
 ```
-#### 测试
+#### 中继测试
 ```shell
 # HTTP代理协议测试
 curl --insecure -v -x http://auh:123123@127.0.0.1:40001 https://ipinfo.io

@@ -60,30 +60,6 @@ public class HttpProxyServerStartup {
             httpProxyServer.start(httpProxyServerConfig);
         }
 
-        // HTTP代理(不解码HTTPS)
-        {
-            HttpProxyServer httpProxyServer = new HttpProxyServer();
-            ProxyServerConfig httpProxyServerConfig = new ProxyServerConfig();
-            httpProxyServerConfig.setProxyProtocols(Arrays.asList(ProxyProtocolEnum.HTTP,
-                    ProxyProtocolEnum.HTTPS,
-                    ProxyProtocolEnum.SOCKS4a,
-                    ProxyProtocolEnum.SOCKS5));
-            httpProxyServerConfig.setCodecMsg(false);
-            httpProxyServerConfig.setPort(40002);
-            httpProxyServerConfig.setUsernamePasswordAuth(new UsernamePasswordAuth("auh", "456789"));
-            httpProxyServerConfig.setBossGroupThreads(5);
-            httpProxyServerConfig.setWorkerGroupThreads(10);
-
-            // 配置中继代理， 指定实际代理服务器
-            RelayServerConfig relayServerConfig = new RelayServerConfig();
-            relayServerConfig.setRelayProtocol(ProxyProtocolEnum.SOCKS5);
-            relayServerConfig.setRelayNetAddress(new NetAddress("45.12.150.148", 6166));
-            relayServerConfig.setRelayUsernamePasswordAuth(new UsernamePasswordAuth("kkiywkmu", "md5ggfgmfos7"));
-            httpProxyServerConfig.setRelayServerConfig(relayServerConfig);
-
-            httpProxyServer.start(httpProxyServerConfig);
-        }
-
         // 多IP出口
         InetAddress[] inetAddresses = LocaleInetAddresses.getInetAddresses();
         if(inetAddresses != null) {
