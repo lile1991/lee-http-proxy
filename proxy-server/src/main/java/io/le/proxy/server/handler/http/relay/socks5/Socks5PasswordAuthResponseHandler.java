@@ -30,7 +30,7 @@ public class Socks5PasswordAuthResponseHandler extends ChannelInboundHandlerAdap
             ctx.pipeline().addAfter(ctx.name(), null, new Socks5CommandResponseHandler(serverConfig, proxyServerChannel, httpRequestInfo));
             ctx.pipeline().addAfter(ctx.name(), null, new Socks5CommandResponseDecoder());
 
-            // 鉴权请求Handler不要了
+            // The socks5 auth is completed!
             ctx.pipeline().remove(Socks5PasswordAuthResponseDecoder.class);
             ctx.pipeline().remove(ctx.name());
 

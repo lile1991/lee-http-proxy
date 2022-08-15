@@ -33,9 +33,9 @@ public class Socks5RelayInitHandler extends ChannelInitializer<Channel> {
     protected void initChannel(Channel ch) throws SSLException, CertificateException {
         ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
         // Socks5MessageByteBuf
+        ch.pipeline().addLast(Socks5ClientEncoder.DEFAULT);
         // sock5 init
         ch.pipeline().addLast(new Socks5InitialResponseDecoder());
-        ch.pipeline().addLast(Socks5ClientEncoder.DEFAULT);
         // sock5 init
         ch.pipeline().addLast(new Socks5RelayInitialResponseHandler(serverConfig, proxyServerChannel, httpRequestInfo));
         log.debug("Add Socks5ClientEncoder to pipeline");

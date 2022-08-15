@@ -85,17 +85,20 @@ public class RelayHandler extends ChannelInboundHandlerAdapter {
                 Channel clientChannel = future.channel();
                 log.debug("Successfully connected to {}!\r\n{}", clientChannel.remoteAddress(), clientChannel);
 
+                // 添加Exchange
+                ctx.pipeline().addLast(new ExchangeHandler(serverConfig, clientChannel));
+                log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
+
                 if(serverConfig.getRelayServerConfig().getRelayProtocol() == ProxyProtocolEnum.SOCKS5) {
-                    // 发送Socks5握手
+                    log.debug("Remove HttpServerCodec from proxy server pipeline.");
+                    ctx.pipeline().remove(HttpServerCodec.class);
+
+                    // Socks5 initial request
                     DefaultSocks5InitialRequest socks5InitialRequest = new DefaultSocks5InitialRequest(relayUsernamePasswordAuth == null ? Socks5AuthMethod.NO_AUTH : Socks5AuthMethod.PASSWORD);
                     log.debug("Write socks5InitialRequest to {}", clientChannel.remoteAddress());
                     clientChannel.writeAndFlush(socks5InitialRequest);
                     return;
                 }
-
-                // 添加Exchange
-                ctx.pipeline().addLast(new ExchangeHandler(serverConfig, clientChannel));
-                log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
 
                 // 转发消息给目标代理
                 log.debug("Write msg to {}", request.method() + " " + request.uri());
