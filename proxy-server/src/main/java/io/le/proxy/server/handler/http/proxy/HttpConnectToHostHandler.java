@@ -2,6 +2,7 @@ package io.le.proxy.server.handler.http.proxy;
 
 import io.le.proxy.server.config.ProxyServerConfig;
 import io.le.proxy.server.handler.ExchangeHandler;
+import io.le.proxy.server.handler.http.HttpAcceptConnectHandler;
 import io.le.proxy.server.handler.http.HttpRequestInfo;
 import io.le.proxy.server.ssl.BouncyCastleCertificateGenerator;
 import io.netty.bootstrap.Bootstrap;
@@ -53,7 +54,7 @@ public class HttpConnectToHostHandler extends ChannelInboundHandlerAdapter {
                     ctx.pipeline().addLast(httpExchangeHandler);
 
                     log.debug("Connection Established\r\n{}", ctx);
-                    response200ProxyEstablished(ctx, request).addListener(future1 -> {
+                    HttpAcceptConnectHandler.response200ProxyEstablished(ctx.channel(), request.protocolVersion()).addListener(future1 -> {
                         if(serverConfig.isCodecMsg()) {
                             // 解码与客户端的HTTPS消息
                             X509Certificate x509Certificate = BouncyCastleCertificateGenerator.generateServerCert(httpRequestInfo.getRemoteHost());
@@ -158,9 +159,4 @@ public class HttpConnectToHostHandler extends ChannelInboundHandlerAdapter {
         return bootstrap.connect(httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort());
     }
 
-    private ChannelFuture response200ProxyEstablished(ChannelHandlerContext ctx, HttpRequest request) {
-        FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(request.protocolVersion(),
-                new HttpResponseStatus(HttpResponseStatus.OK.code(), "Connection Established"));
-        return ctx.writeAndFlush(fullHttpResponse);
-    }
 }

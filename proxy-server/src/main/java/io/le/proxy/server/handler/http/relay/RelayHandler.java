@@ -62,10 +62,20 @@ public class RelayHandler extends ChannelInboundHandlerAdapter {
                     // 连接成功
                     log.debug("Successfully connected to {}!\r\n{}", clientChannel.remoteAddress(), clientChannel);
 
-                    // 发送Connection请求到目标服务器, 握手交给{HttpsConnectedToShakeHandsHandler}做
-                    log.debug("Write msg to {}", request.method() + " " + request.uri());
-                    clientChannel.writeAndFlush(request);
-                    log.debug("Write CONNECT request: {}\r\n{}", request, clientChannel);
+                    switch (serverConfig.getRelayServerConfig().getRelayProtocol()) {
+                        case HTTP:
+                        case HTTPS:
+                            // 发送Connection请求到目标服务器, HTTPS握手交给{HttpsConnectedToShakeHandsHandler}做
+                            log.debug("Write CONNECT request: {}\r\n{}", request, clientChannel);
+                            clientChannel.writeAndFlush(request);
+                            return;
+                        case SOCKS5:
+                            // Socks5 initial request
+                            DefaultSocks5InitialRequest socks5InitialRequest = new DefaultSocks5InitialRequest(relayUsernamePasswordAuth == null ? Socks5AuthMethod.NO_AUTH : Socks5AuthMethod.PASSWORD);
+                            log.debug("Write socks5InitialRequest to {}", clientChannel.remoteAddress());
+                            clientChannel.writeAndFlush(socks5InitialRequest);
+                            return;
+                    }
                 } else {
                     log.error("Failed connect to {}:{}\r\b{}", relayNetAddress.getRemoteHost(), relayNetAddress.getRemotePort(), ctx);
                     if (ctx.channel().isActive()) {
@@ -89,20 +99,23 @@ public class RelayHandler extends ChannelInboundHandlerAdapter {
                 ctx.pipeline().addLast(new ExchangeHandler(serverConfig, clientChannel));
                 log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
 
-                if(serverConfig.getRelayServerConfig().getRelayProtocol() == ProxyProtocolEnum.SOCKS5) {
-                    log.debug("Remove HttpServerCodec from proxy server pipeline.");
-                    ctx.pipeline().remove(HttpServerCodec.class);
+                switch (serverConfig.getRelayServerConfig().getRelayProtocol()) {
+                    case HTTP:
+                    case HTTPS:
+                        // 转发消息给目标代理
+                        log.debug("Write msg to {}", request.method() + " " + request.uri());
+                        clientChannel.writeAndFlush(request);
+                        return;
+                    case SOCKS5:
+                        log.debug("Remove HttpServerCodec from proxy server pipeline.");
+                        ctx.pipeline().remove(HttpServerCodec.class);
 
-                    // Socks5 initial request
-                    DefaultSocks5InitialRequest socks5InitialRequest = new DefaultSocks5InitialRequest(relayUsernamePasswordAuth == null ? Socks5AuthMethod.NO_AUTH : Socks5AuthMethod.PASSWORD);
-                    log.debug("Write socks5InitialRequest to {}", clientChannel.remoteAddress());
-                    clientChannel.writeAndFlush(socks5InitialRequest);
-                    return;
+                        // Socks5 initial request
+                        DefaultSocks5InitialRequest socks5InitialRequest = new DefaultSocks5InitialRequest(relayUsernamePasswordAuth == null ? Socks5AuthMethod.NO_AUTH : Socks5AuthMethod.PASSWORD);
+                        log.debug("Write socks5InitialRequest to {}", clientChannel.remoteAddress());
+                        clientChannel.writeAndFlush(socks5InitialRequest);
+                        return;
                 }
-
-                // 转发消息给目标代理
-                log.debug("Write msg to {}", request.method() + " " + request.uri());
-                clientChannel.writeAndFlush(request);
             } else {
                 log.error("Failed connect to {}:{}\r\b{}", relayNetAddress.getRemoteHost(), relayNetAddress.getRemotePort(), ctx);
                 if (ctx.channel().isActive()) {

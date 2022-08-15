@@ -2,10 +2,7 @@ package io.le.proxy.server.handler.http;
 
 import io.le.proxy.server.config.ProxyServerConfig;
 import io.le.proxy.server.config.UsernamePasswordAuth;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,7 +41,7 @@ public class HttpAcceptConnectHandler extends ChannelInboundHandlerAdapter {
         if(serverConfig.getUsernamePasswordAuth() != null) {
             if(proxyAuthorization == null || proxyAuthorization.isEmpty()) {
                 log.debug("Please provide Proxy-Authorization\r\n{}", ctx);
-                response407ProxyAuthenticationRequired(ctx, request, "Please provide Proxy-Authorization")
+                response407ProxyAuthenticationRequired(ctx.channel(), request.protocolVersion(), "Please provide Proxy-Authorization")
                         .addListener(ChannelFutureListener.CLOSE);
                 return;
             }
@@ -54,7 +51,7 @@ public class HttpAcceptConnectHandler extends ChannelInboundHandlerAdapter {
 
             if(!proxyAuthorization.equals("Basic " + Base64.getEncoder().encodeToString(usernamePassword.getBytes(StandardCharsets.UTF_8)))) {
                 log.debug("Incorrect proxy username or password\r\n{}", ctx);
-                response407ProxyAuthenticationRequired(ctx, request, "Incorrect proxy username or password")
+                response407ProxyAuthenticationRequired(ctx.channel(), request.protocolVersion(), "Incorrect proxy username or password")
                         .addListener(ChannelFutureListener.CLOSE);
                 return;
             }
@@ -65,12 +62,19 @@ public class HttpAcceptConnectHandler extends ChannelInboundHandlerAdapter {
         ctx.fireChannelRead(msg);
     }
 
-    private ChannelFuture response407ProxyAuthenticationRequired(ChannelHandlerContext ctx, HttpRequest request, String reasonPhrase) {
-        FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(request.protocolVersion(),
+
+    public static ChannelFuture response200ProxyEstablished(Channel ch, HttpVersion httpVersion) {
+        FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(httpVersion,
+                new HttpResponseStatus(HttpResponseStatus.OK.code(), "Connection Established"));
+        return ch.writeAndFlush(fullHttpResponse);
+    }
+
+    public static ChannelFuture response407ProxyAuthenticationRequired(Channel ch, HttpVersion httpVersion, String reasonPhrase) {
+        FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(httpVersion,
                 new HttpResponseStatus(HttpResponseStatus.PROXY_AUTHENTICATION_REQUIRED.code(),
                         reasonPhrase)
         );
         fullHttpResponse.headers().set(HttpHeaderNames.PROXY_AUTHENTICATE, "Basic realm=\"Access to the staging site\"");
-        return ctx.writeAndFlush(fullHttpResponse);
+        return ch.writeAndFlush(fullHttpResponse);
     }
 }

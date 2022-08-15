@@ -40,12 +40,8 @@ public class HttpRelayInitHandler extends ChannelInitializer<Channel> {
         ch.pipeline().addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
         log.debug("Add HttpClientCodec to pipeline");
 
-        if(httpRequestInfo.isSsl()) {
-            // HTTPS连接需要处理一次Connect响应， 需要在ProxyExchangeHandler读取到代理服务器响应后
-            ch.pipeline().addLast(HttpsRelayShakeHandsHandler.class.getSimpleName(), new HttpsRelayShakeHandsHandler(serverConfig, proxyServerChannel));
-        } else {
-            ch.pipeline().addLast(ExchangeHandler.class.getSimpleName(), new ExchangeHandler(serverConfig, proxyServerChannel));
-        }
+        // HTTP shake hands
+        ch.pipeline().addLast(HttpsRelayShakeHandsHandler.class.getSimpleName(), new HttpsRelayShakeHandsHandler(serverConfig, proxyServerChannel));
         log.debug("Add ProxyExchangeHandler to pipeline");
     }
 }

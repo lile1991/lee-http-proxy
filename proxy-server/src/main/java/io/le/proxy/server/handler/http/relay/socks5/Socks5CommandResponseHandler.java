@@ -2,13 +2,20 @@ package io.le.proxy.server.handler.http.relay.socks5;
 
 import io.le.proxy.server.config.ProxyServerConfig;
 import io.le.proxy.server.handler.ExchangeHandler;
+import io.le.proxy.server.handler.http.HttpAcceptConnectHandler;
 import io.le.proxy.server.handler.http.HttpRequestInfo;
+import io.le.proxy.server.handler.http.relay.http.HttpsRelayShakeHandsHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.DecoderResult;
-import io.netty.handler.codec.http.*;
-import io.netty.handler.codec.socksx.v5.*;
+import io.netty.handler.codec.http.HttpClientCodec;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpRequestEncoder;
+import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.socksx.v5.DefaultSocks5CommandResponse;
+import io.netty.handler.codec.socksx.v5.Socks5ClientEncoder;
+import io.netty.handler.codec.socksx.v5.Socks5CommandResponseDecoder;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -27,26 +34,40 @@ public class Socks5CommandResponseHandler extends ChannelInboundHandlerAdapter {
         log.debug("channelRead Socks5CommandResponse {}.\r\n{}", msg, ctx);
         DefaultSocks5CommandResponse socks5Command = (DefaultSocks5CommandResponse) msg;
         if(socks5Command.decoderResult() == DecoderResult.SUCCESS) {
-            // log.debug("Add ProxyExchangeHandler to relay client pipeline.");
-            // ctx.pipeline().addAfter(ctx.name(), null, new ProxyExchangeHandler(serverConfig, proxyServerChannel));
-
-            // log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
-            // proxyServerChannel.pipeline().addLast(new ProxyExchangeHandler(serverConfig, ctx.channel()));
-
-            // ctx.pipeline().remove(Socks5ClientEncoder.class);
-            log.debug("Add HttpClientCodec to relay client pipeline.");
-            ctx.pipeline().addFirst(new HttpRequestEncoder());
-
             ctx.pipeline().remove(Socks5ClientEncoder.class);
             ctx.pipeline().remove(Socks5CommandResponseDecoder.class);
             ctx.pipeline().remove(ctx.name());
 
-            log.debug("Write http request to remote.\r\n{}", ctx);
-            ctx.writeAndFlush(httpRequestInfo.getHttpRequest()).addListener(f -> {
-                ctx.pipeline().remove(HttpRequestEncoder.class);
-                log.debug("Add ProxyExchangeHandler to relay server pipeline.");
-                ctx.pipeline().addLast(new ExchangeHandler(serverConfig, proxyServerChannel));
-            });
+            if(httpRequestInfo.isSsl()) {
+                // If the first is an HTTPS connection request,
+                // response with 200(Connection Established).
+                HttpAcceptConnectHandler.response200ProxyEstablished(proxyServerChannel, httpRequestInfo.getHttpRequest().protocolVersion())
+                        .addListener(f -> {
+                            // 中继都不解码消息， 移除代理服务器的解码器
+                            proxyServerChannel.pipeline().remove(HttpServerCodec.class);
+                            proxyServerChannel.pipeline().remove(HttpObjectAggregator.class);
+                            log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
+                            proxyServerChannel.pipeline().addLast(new ExchangeHandler(serverConfig, ctx.channel()));
+                            log.debug("Remove HttpServerCodec from pipeline");
+
+                            ctx.pipeline().remove(ctx.name());
+                            ctx.pipeline().remove(HttpClientCodec.class);
+                            ctx.pipeline().remove(HttpObjectAggregator.class);
+                            ctx.pipeline().addLast(new ExchangeHandler(serverConfig, proxyServerChannel));
+                            log.debug("Add ProxyExchangeHandler to relay server pipeline.");
+                        });
+            } else {
+                // If the first is an HTTP request, forward it to the website.
+                log.debug("Add HttpClientCodec to relay client pipeline.");
+                ctx.pipeline().addFirst(new HttpRequestEncoder());
+
+                log.debug("Write http request to remote.\r\n{}", ctx);
+                ctx.writeAndFlush(httpRequestInfo.getHttpRequest()).addListener(f -> {
+                    ctx.pipeline().remove(HttpRequestEncoder.class);
+                    log.debug("Add ProxyExchangeHandler to relay server pipeline.");
+                    ctx.pipeline().addLast(new ExchangeHandler(serverConfig, proxyServerChannel));
+                });
+            }
         } else {
             log.error("decoderResult is {}, close channel", socks5Command.decoderResult());
             ctx.close();

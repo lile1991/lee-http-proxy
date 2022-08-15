@@ -33,20 +33,19 @@ public class HttpsRelayShakeHandsHandler extends ChannelInboundHandlerAdapter {
         if(HttpResponseStatus.OK.code() == response.status().code()) {
             proxyServerChannel.writeAndFlush(response, proxyServerChannel.newPromise().addListener(f -> {
                 // 中继都不解码消息， 移除代理服务器的解码器
+                log.debug("Remove HttpServerCodec from pipeline\r\n{}", proxyServerChannel);
                 proxyServerChannel.pipeline().remove(HttpServerCodec.class);
                 proxyServerChannel.pipeline().remove(HttpObjectAggregator.class);
                 log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
                 proxyServerChannel.pipeline().addLast(new ExchangeHandler(serverConfig, ctx.channel()));
-                log.debug("Remove HttpServerCodec from pipeline");
 
+                log.debug("Remove HttpClientCodec from pipeline\r\n{}", ctx);
                 ctx.pipeline().remove(ctx.name());
                 ctx.pipeline().remove(HttpClientCodec.class);
                 ctx.pipeline().remove(HttpObjectAggregator.class);
-//                if(serverConfig.getRelayServerConfig().getRelayProtocol() == ProxyProtocolEnum.HTTPS) {
-//                    ctx.pipeline().remove(SslHandler.class);
-//                }
-                ctx.pipeline().addLast(new ExchangeHandler(serverConfig, proxyServerChannel));
+
                 log.debug("Add ProxyExchangeHandler to relay server pipeline.");
+                ctx.pipeline().addLast(new ExchangeHandler(serverConfig, proxyServerChannel));
             }));
         } else {
             proxyServerChannel.writeAndFlush(response).addListener(f -> {

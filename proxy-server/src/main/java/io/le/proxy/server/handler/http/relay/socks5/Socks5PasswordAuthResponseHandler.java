@@ -34,14 +34,7 @@ public class Socks5PasswordAuthResponseHandler extends ChannelInboundHandlerAdap
             ctx.pipeline().remove(Socks5PasswordAuthResponseDecoder.class);
             ctx.pipeline().remove(ctx.name());
 
-            // log.debug("Add ProxyExchangeHandler to relay server pipeline.");
-            // ctx.pipeline().addAfter(ctx.name(), null, new ProxyExchangeHandler(serverConfig, proxyServerChannel));
-
-            // log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
-            // proxyServerChannel.pipeline().addLast(new ProxyExchangeHandler(serverConfig, ctx.channel()));
-
-            // ctx.pipeline().remove(Socks5ClientEncoder.class);
-
+            // Connection to website
             DefaultSocks5CommandRequest socks5CommandRequest = new DefaultSocks5CommandRequest(Socks5CommandType.CONNECT,
                     Socks5AddressType.DOMAIN, httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort());
             ctx.writeAndFlush(socks5CommandRequest);

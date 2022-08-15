@@ -46,7 +46,7 @@ public class HttpProxyServerStartup {
 
             // 配置中继代理， 指定实际代理服务器
             RelayServerConfig relayServerConfig = new RelayServerConfig();
-            relayServerConfig.setRelayProtocol(ProxyProtocolEnum.SOCKS5);
+            relayServerConfig.setRelayProtocol(ProxyProtocolEnum.HTTP);
             relayServerConfig.setRelayNetAddress(new NetAddress("127.0.0.1", 40000));
             relayServerConfig.setRelayUsernamePasswordAuth(new UsernamePasswordAuth("auh", "123123"));
             httpProxyServerConfig.setRelayServerConfig(relayServerConfig);
