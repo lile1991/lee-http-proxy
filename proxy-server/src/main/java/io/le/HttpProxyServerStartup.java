@@ -47,8 +47,32 @@ public class HttpProxyServerStartup {
             // 配置中继代理， 指定实际代理服务器
             RelayServerConfig relayServerConfig = new RelayServerConfig();
             relayServerConfig.setRelayProtocol(ProxyProtocolEnum.SOCKS5);
-            relayServerConfig.setRelayNetAddress(new NetAddress("127.0.0.1", 40000));
-            relayServerConfig.setRelayUsernamePasswordAuth(new UsernamePasswordAuth("auh", "123123"));
+            relayServerConfig.setRelayNetAddress(new NetAddress("194.156.225.1", 7346));
+            relayServerConfig.setRelayUsernamePasswordAuth(new UsernamePasswordAuth("kkiywkmu", "md5ggfgmfos7"));
+            httpProxyServerConfig.setRelayServerConfig(relayServerConfig);
+
+            httpProxyServer.start(httpProxyServerConfig);
+        }
+
+        // HTTP代理(不解码HTTPS)
+        {
+            HttpProxyServer httpProxyServer = new HttpProxyServer();
+            ProxyServerConfig httpProxyServerConfig = new ProxyServerConfig();
+            httpProxyServerConfig.setProxyProtocols(Arrays.asList(ProxyProtocolEnum.HTTP,
+                    ProxyProtocolEnum.HTTPS,
+                    ProxyProtocolEnum.SOCKS4a,
+                    ProxyProtocolEnum.SOCKS5));
+            httpProxyServerConfig.setCodecMsg(false);
+            httpProxyServerConfig.setPort(40002);
+            httpProxyServerConfig.setUsernamePasswordAuth(new UsernamePasswordAuth("auh", "456789"));
+            httpProxyServerConfig.setBossGroupThreads(5);
+            httpProxyServerConfig.setWorkerGroupThreads(10);
+
+            // 配置中继代理， 指定实际代理服务器
+            RelayServerConfig relayServerConfig = new RelayServerConfig();
+            relayServerConfig.setRelayProtocol(ProxyProtocolEnum.SOCKS5);
+            relayServerConfig.setRelayNetAddress(new NetAddress("45.12.150.148", 6166));
+            relayServerConfig.setRelayUsernamePasswordAuth(new UsernamePasswordAuth("kkiywkmu", "md5ggfgmfos7"));
             httpProxyServerConfig.setRelayServerConfig(relayServerConfig);
 
             httpProxyServer.start(httpProxyServerConfig);

@@ -43,21 +43,22 @@ public class Socks5CommandResponseHandler extends ChannelInboundHandlerAdapter {
                 HttpAcceptConnectHandler.response200ProxyEstablished(proxyServerChannel, httpRequestInfo.getHttpRequest().protocolVersion())
                         .addListener(f -> {
                             // 中继都不解码消息， 移除代理服务器的解码器
+                            log.debug("Remove HttpServerCodec from pipeline");
                             proxyServerChannel.pipeline().remove(HttpServerCodec.class);
                             proxyServerChannel.pipeline().remove(HttpObjectAggregator.class);
+
                             log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
                             proxyServerChannel.pipeline().addLast(new ExchangeHandler(serverConfig, ctx.channel()));
-                            log.debug("Remove HttpServerCodec from pipeline");
 
-                            ctx.pipeline().addLast(new ExchangeHandler(serverConfig, proxyServerChannel));
                             log.debug("Add ProxyExchangeHandler to relay server pipeline.");
+                            ctx.pipeline().addLast(new ExchangeHandler(serverConfig, proxyServerChannel));
                         });
             } else {
                 // If the first is an HTTP request, forward it to the website.
                 log.debug("Add HttpClientCodec to relay client pipeline.");
                 ctx.pipeline().addFirst(new HttpRequestEncoder());
 
-                log.debug("Write http request to remote.\r\n{}", ctx);
+                log.debug("Write the first http request to remote.\r\n{}", ctx);
                 ctx.writeAndFlush(httpRequestInfo.getHttpRequest()).addListener(f -> {
                     ctx.pipeline().remove(HttpRequestEncoder.class);
                     log.debug("Add ProxyExchangeHandler to relay server pipeline.");
