@@ -1,7 +1,7 @@
 package io.le.proxy.server.handler.socks5;
 
 import io.le.proxy.server.config.ProxyServerConfig;
-import io.le.proxy.server.handler.ProxyExchangeHandler;
+import io.le.proxy.server.handler.ExchangeHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
@@ -30,7 +30,7 @@ public class Socks5ProxyServerConnectionHandler extends SimpleChannelInboundHand
                         @Override
                         protected void initChannel(SocketChannel ch) {
                             // 将目标服务器信息转发给客户端
-                            ch.pipeline().addLast(new ProxyExchangeHandler(serverConfig, ctx.channel()));
+                            ch.pipeline().addLast(new ExchangeHandler(serverConfig, ctx.channel()));
                         }
                     });
             ChannelFuture future = bootstrap.connect(msg.dstAddr(), msg.dstPort());
@@ -38,7 +38,7 @@ public class Socks5ProxyServerConnectionHandler extends SimpleChannelInboundHand
                 Channel clientChannel = future1.channel();
                 if(future1.isSuccess()) {
                     log.debug("Successfully connected to {}:{}! \r\n{}", msg.dstAddr(), msg.dstPort(), clientChannel);
-                    ctx.pipeline().addLast(new ProxyExchangeHandler(serverConfig, clientChannel));
+                    ctx.pipeline().addLast(new ExchangeHandler(serverConfig, clientChannel));
                     ctx.writeAndFlush(new DefaultSocks5CommandResponse(Socks5CommandStatus.SUCCESS, msg.dstAddrType()));
 
                     ctx.pipeline().remove(Socks5ServerEncoder.class);

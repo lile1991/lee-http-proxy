@@ -1,7 +1,7 @@
 package io.le.proxy.server.handler.http.proxy;
 
 import io.le.proxy.server.config.ProxyServerConfig;
-import io.le.proxy.server.handler.ProxyExchangeHandler;
+import io.le.proxy.server.handler.ExchangeHandler;
 import io.le.proxy.server.handler.http.HttpRequestInfo;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -40,6 +40,6 @@ public class HttpConnectToHostInitHandler extends ChannelInitializer<Channel> {
             ch.pipeline().addLast(new HttpClientCodec());
             ch.pipeline().addLast(new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
         }*/
-        ch.pipeline().addLast(ProxyExchangeHandler.class.getSimpleName(), new ProxyExchangeHandler(serverConfig, proxyServerChannel));
+        ch.pipeline().addLast(ExchangeHandler.class.getSimpleName(), new ExchangeHandler(serverConfig, proxyServerChannel));
     }
 }

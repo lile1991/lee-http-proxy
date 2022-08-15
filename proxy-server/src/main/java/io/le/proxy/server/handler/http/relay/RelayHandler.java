@@ -1,7 +1,7 @@
 package io.le.proxy.server.handler.http.relay;
 
 import io.le.proxy.server.config.*;
-import io.le.proxy.server.handler.ProxyExchangeHandler;
+import io.le.proxy.server.handler.ExchangeHandler;
 import io.le.proxy.server.handler.http.HttpRequestInfo;
 import io.le.proxy.server.handler.http.relay.http.HttpRelayInitHandler;
 import io.le.proxy.server.handler.http.relay.socks5.Socks5RelayInitHandler;
@@ -83,7 +83,6 @@ public class RelayHandler extends ChannelInboundHandlerAdapter {
         connectTargetProxy(ctx, request).addListener((ChannelFutureListener) future -> {
             if(future.isSuccess()) {
                 Channel clientChannel = future.channel();
-                // 连接成功， 移除ConnectionHandler, 添加ExchangeHandler
                 log.debug("Successfully connected to {}!\r\n{}", clientChannel.remoteAddress(), clientChannel);
 
                 if(serverConfig.getRelayServerConfig().getRelayProtocol() == ProxyProtocolEnum.SOCKS5) {
@@ -95,7 +94,7 @@ public class RelayHandler extends ChannelInboundHandlerAdapter {
                 }
 
                 // 添加Exchange
-                ctx.pipeline().addLast(new ProxyExchangeHandler(serverConfig, clientChannel));
+                ctx.pipeline().addLast(new ExchangeHandler(serverConfig, clientChannel));
                 log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
 
                 // 转发消息给目标代理

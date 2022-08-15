@@ -31,7 +31,7 @@ public class Socks5RelayInitHandler extends ChannelInitializer<Channel> {
 
     @Override
     protected void initChannel(Channel ch) throws SSLException, CertificateException {
-        ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
+        ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
         // Socks5MessageByteBuf
         // sock5 init
         ch.pipeline().addLast(new Socks5InitialResponseDecoder());

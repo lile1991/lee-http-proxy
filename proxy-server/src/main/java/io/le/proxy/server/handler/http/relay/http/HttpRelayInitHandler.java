@@ -2,7 +2,7 @@ package io.le.proxy.server.handler.http.relay.http;
 
 import io.le.proxy.server.config.ProxyProtocolEnum;
 import io.le.proxy.server.config.ProxyServerConfig;
-import io.le.proxy.server.handler.ProxyExchangeHandler;
+import io.le.proxy.server.handler.ExchangeHandler;
 import io.le.proxy.server.handler.http.HttpRequestInfo;
 import io.le.proxy.server.handler.https.SslHandlerCreator;
 import io.netty.channel.Channel;
@@ -44,7 +44,7 @@ public class HttpRelayInitHandler extends ChannelInitializer<Channel> {
             // HTTPS连接需要处理一次Connect响应， 需要在ProxyExchangeHandler读取到代理服务器响应后
             ch.pipeline().addLast(HttpsRelayShakeHandsHandler.class.getSimpleName(), new HttpsRelayShakeHandsHandler(serverConfig, proxyServerChannel));
         } else {
-            ch.pipeline().addLast(ProxyExchangeHandler.class.getSimpleName(), new ProxyExchangeHandler(serverConfig, proxyServerChannel));
+            ch.pipeline().addLast(ExchangeHandler.class.getSimpleName(), new ExchangeHandler(serverConfig, proxyServerChannel));
         }
         log.debug("Add ProxyExchangeHandler to pipeline");
     }

@@ -8,14 +8,14 @@ import io.netty.handler.codec.http.HttpObject;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Http代理交换机
+ * 交换机
  */
 @Slf4j
-public class ProxyExchangeHandler extends ChannelInboundHandlerAdapter {
+public class ExchangeHandler extends ChannelInboundHandlerAdapter {
     private final ProxyServerConfig serverConfig;
     private final Channel exchangeChannel;
 
-    public ProxyExchangeHandler(ProxyServerConfig serverConfig, Channel exchangeChannel) {
+    public ExchangeHandler(ProxyServerConfig serverConfig, Channel exchangeChannel) {
         this.serverConfig = serverConfig;
         this.exchangeChannel = exchangeChannel;
     }
@@ -29,13 +29,13 @@ public class ProxyExchangeHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if(log.isDebugEnabled()) {
             if(msg instanceof HttpObject) {
-                log.debug("Read a message {} from remote: \r\n{}\r\n{}", msg.getClass().getSimpleName(), msg, exchangeChannel.toString());
+                log.debug("Read a message {} from remote: \r\n{}\r\n{}", msg.getClass().getSimpleName(), msg, exchangeChannel);
             } else {
-                log.debug("Read a message {} from remote: \r\n{}\r\n{}", msg.getClass().getSimpleName(), msg, exchangeChannel.toString());
+                log.debug("Read a message {} from remote: \r\n{}\r\n{}", msg.getClass().getSimpleName(), msg, exchangeChannel);
             }
         }
 
-        log.debug("Forward the message. \r\n{}\r\n{}", msg, exchangeChannel.toString());
+        log.debug("Forward the message. \r\n{}\r\n{}", msg, exchangeChannel);
         exchangeChannel.writeAndFlush(msg);
     }
 }

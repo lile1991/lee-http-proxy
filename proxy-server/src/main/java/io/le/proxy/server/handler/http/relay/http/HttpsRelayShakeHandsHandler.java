@@ -1,7 +1,7 @@
 package io.le.proxy.server.handler.http.relay.http;
 
 import io.le.proxy.server.config.ProxyServerConfig;
-import io.le.proxy.server.handler.ProxyExchangeHandler;
+import io.le.proxy.server.handler.ExchangeHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -36,7 +36,7 @@ public class HttpsRelayShakeHandsHandler extends ChannelInboundHandlerAdapter {
                 proxyServerChannel.pipeline().remove(HttpServerCodec.class);
                 proxyServerChannel.pipeline().remove(HttpObjectAggregator.class);
                 log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
-                proxyServerChannel.pipeline().addLast(new ProxyExchangeHandler(serverConfig, ctx.channel()));
+                proxyServerChannel.pipeline().addLast(new ExchangeHandler(serverConfig, ctx.channel()));
                 log.debug("Remove HttpServerCodec from pipeline");
 
                 ctx.pipeline().remove(ctx.name());
@@ -45,7 +45,7 @@ public class HttpsRelayShakeHandsHandler extends ChannelInboundHandlerAdapter {
 //                if(serverConfig.getRelayServerConfig().getRelayProtocol() == ProxyProtocolEnum.HTTPS) {
 //                    ctx.pipeline().remove(SslHandler.class);
 //                }
-                ctx.pipeline().addLast(new ProxyExchangeHandler(serverConfig, proxyServerChannel));
+                ctx.pipeline().addLast(new ExchangeHandler(serverConfig, proxyServerChannel));
                 log.debug("Add ProxyExchangeHandler to relay server pipeline.");
             }));
         } else {

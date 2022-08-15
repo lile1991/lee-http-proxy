@@ -1,7 +1,7 @@
 package io.le.proxy.server.handler.http.proxy;
 
 import io.le.proxy.server.config.ProxyServerConfig;
-import io.le.proxy.server.handler.ProxyExchangeHandler;
+import io.le.proxy.server.handler.ExchangeHandler;
 import io.le.proxy.server.handler.http.HttpRequestInfo;
 import io.le.proxy.server.ssl.BouncyCastleCertificateGenerator;
 import io.netty.bootstrap.Bootstrap;
@@ -24,7 +24,7 @@ public class HttpConnectToHostHandler extends ChannelInboundHandlerAdapter {
 
     HttpRequestInfo httpRequestInfo;
     final ProxyServerConfig serverConfig;
-    ProxyExchangeHandler httpProxyExchangeHandler;
+    ExchangeHandler httpExchangeHandler;
     // private final List<Object> messageQueue = new ArrayList<>();
 
     public HttpConnectToHostHandler(ProxyServerConfig serverConfig) {
@@ -49,8 +49,8 @@ public class HttpConnectToHostHandler extends ChannelInboundHandlerAdapter {
                     // 连接成功， 移除ConnectionHandler, 添加ExchangeHandler
                     log.debug("Successfully connected to {}:{}!\r\n{}", httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort(), clientChannel);
 
-                    httpProxyExchangeHandler = new ProxyExchangeHandler(serverConfig, clientChannel);
-                    ctx.pipeline().addLast(httpProxyExchangeHandler);
+                    httpExchangeHandler = new ExchangeHandler(serverConfig, clientChannel);
+                    ctx.pipeline().addLast(httpExchangeHandler);
 
                     log.debug("Connection Established\r\n{}", ctx);
                     response200ProxyEstablished(ctx, request).addListener(future1 -> {
@@ -67,8 +67,8 @@ public class HttpConnectToHostHandler extends ChannelInboundHandlerAdapter {
                             SslContext sslCtxForClient = SslContextBuilder
                                     .forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
                             clientChannel.pipeline().addFirst(sslCtxForClient.newHandler(clientChannel.alloc(), httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort()));
-                            clientChannel.pipeline().addBefore(ProxyExchangeHandler.class.getSimpleName(), null, new HttpClientCodec());
-                            clientChannel.pipeline().addBefore(ProxyExchangeHandler.class.getSimpleName(), null, new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
+                            clientChannel.pipeline().addBefore(ExchangeHandler.class.getSimpleName(), null, new HttpClientCodec());
+                            clientChannel.pipeline().addBefore(ExchangeHandler.class.getSimpleName(), null, new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
                             log.debug("Add HttpClientCodec to pipeline");
                         } else {
                             // 不解码消息， 移除代理服务器的解码器
@@ -98,13 +98,13 @@ public class HttpConnectToHostHandler extends ChannelInboundHandlerAdapter {
                 // 连接成功
                 log.debug("Successfully connected to {}:{}!\r\n{}", httpRequestInfo.getRemoteHost(), httpRequestInfo.getRemotePort(), clientChannel);
 
-                clientChannel.pipeline().addBefore(ProxyExchangeHandler.class.getSimpleName(), null, new HttpClientCodec());
-                clientChannel.pipeline().addBefore(ProxyExchangeHandler.class.getSimpleName(), null, new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
+                clientChannel.pipeline().addBefore(ExchangeHandler.class.getSimpleName(), null, new HttpClientCodec());
+                clientChannel.pipeline().addBefore(ExchangeHandler.class.getSimpleName(), null, new HttpObjectAggregator(serverConfig.getHttpObjectAggregatorMaxContentLength()));
                 log.debug("Add HttpClientCodec to pipeline.");
 
                 // 添加Exchange
-                httpProxyExchangeHandler = new ProxyExchangeHandler(serverConfig, clientChannel);
-                ctx.pipeline().addLast(httpProxyExchangeHandler);
+                httpExchangeHandler = new ExchangeHandler(serverConfig, clientChannel);
+                ctx.pipeline().addLast(httpExchangeHandler);
                 log.debug("Add ProxyExchangeHandler to proxy server pipeline.");
 
                 // 转发消息给目标服务器
