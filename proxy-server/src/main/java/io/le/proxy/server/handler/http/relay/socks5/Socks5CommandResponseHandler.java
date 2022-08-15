@@ -13,6 +13,8 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.socksx.v5.DefaultSocks5CommandResponse;
 import io.netty.handler.codec.socksx.v5.Socks5ClientEncoder;
 import io.netty.handler.codec.socksx.v5.Socks5CommandResponseDecoder;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -33,9 +35,9 @@ public class Socks5CommandResponseHandler extends ChannelInboundHandlerAdapter {
         if(socks5Command.decoderResult() == DecoderResult.SUCCESS) {
             ctx.pipeline().remove(Socks5ClientEncoder.class);
             ctx.pipeline().remove(Socks5CommandResponseDecoder.class);
-            ctx.pipeline().remove(ctx.name());
 
             if(httpRequestInfo.isSsl()) {
+                ctx.pipeline().remove(ctx.name());
                 // If the first is an HTTPS connection request,
                 // response with 200(Connection Established).
                 HttpAcceptConnectHandler.response200ProxyEstablished(proxyServerChannel, httpRequestInfo.getHttpRequest().protocolVersion())
@@ -54,7 +56,8 @@ public class Socks5CommandResponseHandler extends ChannelInboundHandlerAdapter {
             } else {
                 // If the first is an HTTP request, forward it to the website.
                 log.debug("Add HttpClientCodec to relay client pipeline.");
-                ctx.pipeline().addFirst(new HttpRequestEncoder());
+                ctx.pipeline().addBefore(ctx.name(), null, new HttpRequestEncoder());
+                ctx.pipeline().remove(ctx.name());
 
                 HttpRequest request = httpRequestInfo.getHttpRequest();
                 request.headers().remove(HttpHeaderNames.PROXY_AUTHORIZATION.toString());
@@ -64,7 +67,14 @@ public class Socks5CommandResponseHandler extends ChannelInboundHandlerAdapter {
                     request.headers().add(HttpHeaderNames.CONNECTION.toString(), connection);
                 }
                 log.debug("Write the first http request to remote.\r\n{}\r\n{}", httpRequestInfo.getHttpRequest(), ctx);
-                ctx.writeAndFlush(httpRequestInfo.getHttpRequest(), ctx.newPromise().addListener(f -> {
+                ctx.channel().writeAndFlush(httpRequestInfo.getHttpRequest(), ctx.newPromise().addListener(f -> {
+                    if(!f.isSuccess()) {
+                        log.error("Write the first http request to remote error: ", f.cause());
+                        ctx.close();
+                        proxyServerChannel.close();
+                        return;
+                    }
+
                     log.debug("Remove HttpServerCodec from proxy server pipeline.");
                     proxyServerChannel.pipeline().remove(HttpServerCodec.class);
                     proxyServerChannel.pipeline().remove(HttpObjectAggregator.class);
